@@ -9,6 +9,7 @@ using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using AdventureGame.Menus;
 
 namespace NinjaGame.Scenes
 {
@@ -18,6 +19,7 @@ namespace NinjaGame.Scenes
 
         protected int _batchTaskId;
         protected int _currentId;
+        protected bool _assetsLoaded;
         protected Text _splashText;
         protected SpriteBatch _spriteBatch;
         protected List<Task> _completedTasks;
@@ -31,7 +33,7 @@ namespace NinjaGame.Scenes
             _spriteBatch = new SpriteBatch(MainGame.Instance.GraphicsDevice);
 
             var spriteFont = MainGame.Instance.AssetManager.GetSpriteFontAsset("000000000003");
-            _splashText = new Text(spriteFont, Color.White, Color.Gray, new Vector2(), new Vector2(200,200), "SPLASH!");
+            _splashText = new Text("", spriteFont, Color.White, Color.Gray, new Vector2(), new Vector2(200,200), "SPLASH!");
             _splashText.Center();
 
             var task = Task.Factory.StartNew(LoadBatch);
@@ -57,6 +59,23 @@ namespace NinjaGame.Scenes
             foreach (var id in taskDict.Keys)
                 ids.Add(id);
 
+            if (ids.Count == 0 && !_assetsLoaded)
+            {
+                _assetsLoaded = true;
+                foreach (var gid in GlobalConfig.StartupGraphicIds)
+                {
+                    var t = Task.Factory.StartNew(() => LoadGraphic(GlobalConfig.DefaultGraphicsDefinitionFile, gid));
+                    _runningTasks.Add(_currentId, t);
+                    _currentId++;
+                }
+            }
+            else if (ids.Count == 0)
+            {
+                var mainMenu = new MainMenu();
+                MainGame.Instance.PopScene();
+                MainGame.Instance.PushScene(mainMenu);
+            }
+
             for (int i = 0; i < ids.Count; i++)
             {
                 var task = taskDict[ids[i]];
@@ -65,7 +84,7 @@ namespace NinjaGame.Scenes
                     _runningTasks.Remove(ids[i]);
                     _completedTasks.Add(task);
 
-                    if (task.Id == _batchTaskId)
+                    if (ids[i] == _batchTaskId)
                     {
                         var batch = MainGame.Instance.AssetManager.GetAssetBatch(GlobalConfig.StartupAssetBatchId);
                         foreach (var p in batch.GetAllFileIdPairs())
@@ -87,6 +106,11 @@ namespace NinjaGame.Scenes
         private void LoadAsset(string fileName, string id, string batchId)
         {
             MainGame.Instance.AssetManager.LoadAsset(fileName, id, batchId);
+        }
+
+        private void LoadGraphic(string fileName, string id)
+        {
+            MainGame.Instance.GraphicsManager.LoadGraphic(fileName, id);
         }
     }
 }

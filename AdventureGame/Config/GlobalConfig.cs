@@ -11,8 +11,11 @@ namespace NinjaGame.Config
     {
         public static string InitialAssetDefinitionFile { get; set; }
         public static string InitialAssetBatchId { get; set; }
+        public static List<string> InitialGraphicIds { get; set; }
         public static string StartupAssetDefinitionFile { get; set; }
         public static string StartupAssetBatchId { get; set; }
+        public static List<string> StartupGraphicIds { get; set; }
+        public static string DefaultGraphicsDefinitionFile { get; set; }
 
         public static void Initialize()
         {
@@ -31,11 +34,32 @@ namespace NinjaGame.Config
                     case ("initialassetbatchid"):
                         InitialAssetBatchId = pair[1].Trim();
                         break;
+                    case ("initialgraphicids"):
+                        {
+                            var gids = pair[1].Trim().Split(',');
+                            for (int i = 0; i < gids.Length; i++)
+                                gids[i] = gids[i].Trim();
+
+                            InitialGraphicIds = new List<string>(gids);
+                        }
+                        break;
                     case ("startupassetdefinitionfile"):
                         StartupAssetDefinitionFile = pair[1].Trim();
                         break;
                     case ("startupassetbatchid"):
                         StartupAssetBatchId = pair[1].Trim();
+                        break;
+                    case ("startupgraphicids"):
+                        {
+                            var gids = pair[1].Trim().Split(',');
+                            for (int i = 0; i < gids.Length; i++)
+                                gids[i] = gids[i].Trim();
+
+                            StartupGraphicIds = new List<string>(gids);
+                        }
+                        break;
+                    case ("defaultgraphicsdefinitionfile"):
+                        DefaultGraphicsDefinitionFile = pair[1].Trim();
                         break;
                 }
             }

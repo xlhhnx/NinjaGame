@@ -4,6 +4,10 @@ namespace NinjaGame.Graphics2D.Assets
 {
     public class Effect : BaseGraphic2D
     {
+        public Effect(string id) : base(id)
+        {
+        }
+
         public override bool Loaded { get { throw new NotImplementedException(); } }
         public override GraphicType GraphicType { get { return GraphicType.Effect; } }
 

@@ -12,17 +12,18 @@ namespace NinjaGame.Graphics2D.Loading
 {
     public class Graphic2DLoader : IGraphic2DLoader
     {
-        protected Dictionary<string, string[]> _stagedFiles;
+        protected Dictionary<string, List<string>> _stagedFiles;
         protected IAssetManager _assetManager;
 
         public Graphic2DLoader(IAssetManager assetManager)
         {
+            _stagedFiles = new Dictionary<string, List<string>>();
             _assetManager = assetManager;
         }
 
         public Text LoadText(string filePath, string id)
         {
-            string[] fileContents;
+            var fileContents = new List<string>();
 
             if (_stagedFiles.ContainsKey(filePath))
             {
@@ -30,7 +31,7 @@ namespace NinjaGame.Graphics2D.Loading
             }
             else
             {
-                fileContents = File.ReadAllLines(filePath);
+                fileContents = File.ReadAllLines(filePath).ToList();
             }
 
             var text = fileContents.Where(l => l.Trim().Length > 0)
@@ -44,7 +45,7 @@ namespace NinjaGame.Graphics2D.Loading
 
         public Image LoadImage(string filePath, string id)
         {
-            string[] fileContents;
+            var fileContents = new List<string>();
 
             if (_stagedFiles.ContainsKey(filePath))
             {
@@ -52,7 +53,7 @@ namespace NinjaGame.Graphics2D.Loading
             }
             else
             {
-                fileContents = File.ReadAllLines(filePath);
+                fileContents = File.ReadAllLines(filePath).ToList();
             }
 
             var image = fileContents.Where(l => l.Trim().Length > 0)
@@ -66,7 +67,7 @@ namespace NinjaGame.Graphics2D.Loading
 
         public Sprite LoadSprite(string filePath, string id)
         {
-            string[] fileContents;
+            var fileContents = new List<string>();
 
             if (_stagedFiles.ContainsKey(filePath))
             {
@@ -74,7 +75,7 @@ namespace NinjaGame.Graphics2D.Loading
             }
             else
             {
-                fileContents = File.ReadAllLines(filePath);
+                fileContents = File.ReadAllLines(filePath).ToList();
             }
 
             var sprite = fileContents.Where(l => l.Trim().Length > 0)
@@ -88,7 +89,7 @@ namespace NinjaGame.Graphics2D.Loading
 
         public Effect LoadEffect(string filePath, string id)
         {
-            string[] fileContents;
+            var fileContents = new List<string>();
 
             if (_stagedFiles.ContainsKey(filePath))
             {
@@ -96,7 +97,7 @@ namespace NinjaGame.Graphics2D.Loading
             }
             else
             {
-                fileContents = File.ReadAllLines(filePath);
+                fileContents = File.ReadAllLines(filePath).ToList();
             }
 
             var effect = fileContents.Where(l => l.Trim().Length > 0)
@@ -110,7 +111,7 @@ namespace NinjaGame.Graphics2D.Loading
 
         public IGraphic2D LoadGraphic(string filePath, string id)
         {
-            string[] fileContents;
+            var fileContents = new List<string>();
 
             if (_stagedFiles.ContainsKey(filePath))
             {
@@ -118,7 +119,7 @@ namespace NinjaGame.Graphics2D.Loading
             }
             else
             {
-                fileContents = File.ReadAllLines(filePath);
+                fileContents = File.ReadAllLines(filePath).ToList();
             }
 
             var graphic = fileContents.Where(l => l.Trim().Length > 0)
@@ -131,7 +132,7 @@ namespace NinjaGame.Graphics2D.Loading
 
         public List<IGraphic2D> LoadGraphics(string filePath)
         {
-            string[] fileContents;
+            var fileContents = new List<string>();
 
             if (_stagedFiles.ContainsKey(filePath))
             {
@@ -139,7 +140,7 @@ namespace NinjaGame.Graphics2D.Loading
             }
             else
             {
-                fileContents = File.ReadAllLines(filePath);
+                fileContents = File.ReadAllLines(filePath).ToList();
             }
 
             var graphics = fileContents.Where(l => l.Trim().Length > 0)
@@ -153,12 +154,12 @@ namespace NinjaGame.Graphics2D.Loading
         {
             if (!_stagedFiles.ContainsKey(filePath))
             {
-                var fileContents = File.ReadAllLines(filePath);
+                var fileContents = File.ReadAllLines(filePath).ToList();
                 _stagedFiles.Add(filePath, fileContents);
             }
             else if (overwrite)
             {
-                var fileContents = File.ReadAllLines(filePath);
+                var fileContents = File.ReadAllLines(filePath).ToList();
                 _stagedFiles[filePath] = fileContents;
             }
         }
@@ -175,23 +176,22 @@ namespace NinjaGame.Graphics2D.Loading
         {
             BaseGraphic2D graphic = null;
             var arguments = graphicDefinition.Split(';');
-
-            // If the string provided is not a graphic definition return null
-            if (arguments[0].Trim().ToLower() != "graphic") return null;
-
-            var id = arguments[1];
             var parameters = arguments.Where(a => a.Contains("="))
                                       .ToList();
-
+            
+            var id = "";
             var type = "";
-
             foreach (var p in parameters)
             {
                 var pair = p.Split('=');
-                if (pair[0].Trim().ToLower() == "type")
+                switch (pair[0].Trim().ToLower())
                 {
-                    type = pair[1].Trim().ToLower();
-                    break;
+                    case ("graphic"):
+                        type = pair[1].Trim().ToLower();
+                        break;
+                    case ("id"):
+                        id = pair[1].Trim();
+                        break;
                 }
             }
 
@@ -265,7 +265,7 @@ namespace NinjaGame.Graphics2D.Loading
                 spriteFontAsset = AssetConfig.DefaultSpriteFontAsset;
             }
 
-            return new Text(spriteFontAsset, color, disabledColor, positionOffset, dimensions, fullText);
+            return new Text(id, spriteFontAsset, color, disabledColor, positionOffset, dimensions, fullText);
         }
 
         private Image ParseImage(string id, List<string> parameters)
@@ -334,12 +334,12 @@ namespace NinjaGame.Graphics2D.Loading
             }
 
             var texture2DAsset = _assetManager.GetTexture2DAsset(texture2DAssetId);
-            if (texture2DAsset == null)
+            if (texture2DAsset is null)
             {
                 texture2DAsset = AssetConfig.DefaultTexture2DAsset;
             }
 
-            return new Image(texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible);
+            return new Image(id, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible);
         }
 
         private Sprite ParseSprite(string id, List<string> parameters)
@@ -437,12 +437,12 @@ namespace NinjaGame.Graphics2D.Loading
                 texture2DAsset = AssetConfig.DefaultTexture2DAsset;
             }
 
-            return new Sprite(texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, rows, columns, frameTime, looping, enabled, visible);
+            return new Sprite(id, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, rows, columns, frameTime, looping, enabled, visible);
         }
 
         private Effect ParseEffect(string id, List<string> parameters)
         {
-            return new Effect();
+            return new Effect(id);
         }
     }
 }

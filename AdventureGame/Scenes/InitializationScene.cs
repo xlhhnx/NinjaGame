@@ -12,7 +12,7 @@ namespace NinjaGame.Scenes
 
         public InitializationScene()
         {
-            MainGame.Instance.SetFullScreen(true);
+            // MainGame.Instance.SetFullScreen(true);
             MainGame.Instance.SetResolution();
 
             _task = new Task(Load);

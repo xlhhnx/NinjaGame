@@ -17,8 +17,8 @@ namespace NinjaGame.Graphics2D.Assets
         protected Rectangle _sourceRectangle;
         protected Color _color;
 
-
-        public Image(Texture2DAsset texture2DAsset, Vector2 sourcePosition, Vector2 sourceDimensions, Color color, Vector2 positionOffset, Vector2 dimsensions, bool enabled = true, bool visible = true)
+        public Image(string id, Texture2DAsset texture2DAsset, Vector2 sourcePosition, Vector2 sourceDimensions, Color color, Vector2 positionOffset, Vector2 dimsensions, bool enabled = true, bool visible = true)
+            : base(id)
         {
             _texture2DAsset = texture2DAsset;
             _sourceRectangle = new Rectangle(sourcePosition.ToPoint(), sourceDimensions.ToPoint());
@@ -31,7 +31,7 @@ namespace NinjaGame.Graphics2D.Assets
 
         public override IGraphic2D Copy()
         {
-            return new Image(_texture2DAsset, _sourceRectangle.GetPosition(), _sourceRectangle.GetDimensions(), _color, _positionOffset, _dimensions, _enabled, _visible);
+            return new Image(Id, _texture2DAsset, _sourceRectangle.GetPosition(), _sourceRectangle.GetDimensions(), _color, _positionOffset, _dimensions, _enabled, _visible);
         }
     }
 }

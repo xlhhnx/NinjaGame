@@ -43,6 +43,11 @@ namespace NinjaGame.Graphics2D.Assets
         protected Vector2 _dimensions;
 
 
+        public BaseGraphic2D(string id)
+        {
+            _id = id;
+        }
+
         public virtual void Unload() { /* No op */ }
 
         public virtual void Center()

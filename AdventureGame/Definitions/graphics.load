@@ -1,1 +1,2 @@
-﻿
+﻿graphic=image; id=000000000001; name=defaultButtonBackground; texture2dassetid=000000000002; color=0xFFFFFF; sourceposition=(0,0); sourcedimensions=(100,100); positionoffset=(0,0); dimensions=(75,20); enabled=true; visible=true
+graphic=text; id=000000000002; name=defaultButtonTExt; spritefontassetid=000000000001; color=0x000000; disabledcolor=0x550000; positionoffset=(0,0); dimensions=(75,20); fulltext=Button

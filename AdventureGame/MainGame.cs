@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using NinjaGame.Graphics2D.Loading;
 
 namespace NinjaGame
 {
@@ -97,6 +98,7 @@ namespace NinjaGame
                 });
 
             _assetManager = new AssetManager(Services);
+            _graphicsManager = new Graphics2DManager(new Graphic2DLoader(_assetManager));
 
             _sceneStack.Push(new InitializationScene());
 

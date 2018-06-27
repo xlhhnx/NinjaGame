@@ -72,6 +72,9 @@ namespace NinjaGame.Assets.Management
 
             lock (batch)
                 batch.AddAsset(asset);
+
+            lock (_assetDict)
+                _assetDict.Add(id, asset);
         }
     
         public void LoadAssetBatch(string filePath, string id)
