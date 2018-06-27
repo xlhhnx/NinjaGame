@@ -1,0 +1,2 @@
+﻿batch; 000001; Definitions\assets.load = { 000000000003 }
+batch; 000002; Definitions\assets.load = { 000000000001 , 000000000002 }
