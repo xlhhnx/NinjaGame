@@ -9,8 +9,8 @@
     <ProjectGuid>{1CCC915A-BDD4-47B0-9577-FBF89F4D7FE9}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AdventureGame</RootNamespace>
-    <AssemblyName>AdventureGame</AssemblyName>
+    <RootNamespace>NinjaGame</RootNamespace>
+    <AssemblyName>NinjaGame</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -63,24 +63,35 @@
     <Compile Include="Common\Bounding\IBounds.cs" />
     <Compile Include="Common\Extensions\RectangleExtensions.cs" />
     <Compile Include="Common\Extensions\StringExtensions.cs" />
+    <Compile Include="Common\Extensions\TaskExtensions.cs" />
     <Compile Include="Common\Extensions\Vector2Extensions.cs" />
+    <Compile Include="Common\ScreenMode.cs" />
+    <Compile Include="Common\Taskbar.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="Config\GlobalConfig.cs" />
-    <Compile Include="Graphics\Assets\BaseGraphic2D.cs" />
-    <Compile Include="Graphics\Assets\Effect.cs" />
-    <Compile Include="Graphics\Assets\IGraphic2D.cs" />
-    <Compile Include="Graphics\Assets\Image.cs" />
-    <Compile Include="Graphics\Assets\Sprite.cs" />
-    <Compile Include="Graphics\Assets\Text.cs" />
-    <Compile Include="Graphics\Config\Graphics2DConfig.cs" />
-    <Compile Include="Graphics\Extensions\SpriteBatchExtensions.cs" />
-    <Compile Include="Graphics\GraphicType.cs" />
-    <Compile Include="Graphics\Loading\Graphic2DLoader.cs" />
-    <Compile Include="Graphics\Loading\IGraphic2DLoader.cs" />
-    <Compile Include="Graphics\Managers\Graphics2DManager.cs" />
-    <Compile Include="Graphics\Managers\IGraphicsManager.cs" />
+    <Compile Include="Graphics2D\Assets\BaseGraphic2D.cs" />
+    <Compile Include="Graphics2D\Assets\Effect.cs" />
+    <Compile Include="Graphics2D\Assets\IGraphic2D.cs" />
+    <Compile Include="Graphics2D\Assets\Image.cs" />
+    <Compile Include="Graphics2D\Assets\Sprite.cs" />
+    <Compile Include="Graphics2D\Assets\Text.cs" />
+    <Compile Include="Graphics2D\Batches\Graphic2DBatch.cs" />
+    <Compile Include="Graphics2D\Batches\IGraphic2DBatch.cs" />
+    <Compile Include="Graphics2D\Config\Graphics2DConfig.cs" />
+    <Compile Include="Graphics2D\Extensions\SpriteBatchExtensions.cs" />
+    <Compile Include="Graphics2D\GraphicType.cs" />
+    <Compile Include="Graphics2D\Loading\Graphic2DLoader.cs" />
+    <Compile Include="Graphics2D\Loading\IGraphic2DLoader.cs" />
+    <Compile Include="Graphics2D\Managers\Graphics2DManager.cs" />
+    <Compile Include="Graphics2D\Managers\IGraphicsManager.cs" />
+    <Compile Include="Graphics2D\StagedGraphic.cs" />
     <Compile Include="Input\ButtonStates.cs" />
+    <Compile Include="Input\Controllers\GamepadController.cs" />
     <Compile Include="Input\Controllers\KeyboardController.cs" />
+    <Compile Include="Input\Controllers\MouseController.cs" />
+    <Compile Include="Input\GamepadAnalogSticks.cs" />
+    <Compile Include="Input\GamepadButtons.cs" />
+    <Compile Include="Input\GamepadTriggers.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\Controllers\IController.cs" />
     <Compile Include="Input\MouseButtons.cs" />
@@ -91,6 +102,15 @@
     <Compile Include="Scenes\IScene.cs" />
     <Compile Include="Scenes\InitializationScene.cs" />
     <Compile Include="Scenes\StartupScene.cs" />
+    <Compile Include="Tasks\GameTask.cs" />
+    <Compile Include="Tasks\LoadAssetBatchTask.cs" />
+    <Compile Include="Tasks\LoadAssetTask.cs" />
+    <Compile Include="Tasks\LoadBatchAssetsTask.cs" />
+    <Compile Include="Tasks\LoadBatchGraphicsTask.cs" />
+    <Compile Include="Tasks\LoadGraphicsBatchTask.cs" />
+    <Compile Include="Tasks\LoadGraphicTask.cs" />
+    <Compile Include="UI\Button.cs" />
+    <Compile Include="UI\IButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

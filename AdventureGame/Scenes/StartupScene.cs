@@ -1,45 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using NinjaGame.Config;
 using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using AdventureGame.Menus;
+using NinjaGame.Menus;
+using NinjaGame.Tasks;
+using NinjaGame.Assets.Batches;
+using NinjaGame.Graphics2D.Batches;
 
 namespace NinjaGame.Scenes
 {
     public class StartupScene : IScene
-    {
-        protected float Status { get { return _runningTasks.Count / (_runningTasks.Count + _completedTasks.Count); } }
-
-        protected int _batchTaskId;
-        protected int _currentId;
+    {        
         protected bool _assetsLoaded;
         protected Text _splashText;
         protected SpriteBatch _spriteBatch;
-        protected List<Task> _completedTasks;
-        protected Dictionary<int, Task> _runningTasks;
 
         public StartupScene()
         {
-            _currentId = 0;
-            _runningTasks = new Dictionary<int, Task>();
-            _completedTasks = new List<Task>();
             _spriteBatch = new SpriteBatch(MainGame.Instance.GraphicsDevice);
 
             var spriteFont = MainGame.Instance.AssetManager.GetSpriteFontAsset("000000000003");
-            _splashText = new Text("", spriteFont, Color.White, Color.Gray, new Vector2(), new Vector2(200,200), "SPLASH!");
+            _splashText = MainGame.Instance.GraphicsManager.GetText("000000000003");
             _splashText.Center();
 
-            var task = Task.Factory.StartNew(LoadBatch);
-            _batchTaskId = _currentId;
-            _runningTasks.Add(_currentId, task);
-            _currentId++;
+            MainGame.Instance.AssetManager.AssetBatchLoadedEvent += HandleAssetBatchLoaded;
+            MainGame.Instance.AssetManager.BatchAssetsLoadedEvent += HandleBatchAssetsLoaded;
+            MainGame.Instance.GraphicsManager.GraphicBatchLoadedEvent += HandleGraphicBatchLoaded;
+            MainGame.Instance.GraphicsManager.BatchGraphicsLoadedEvent += HandleBatchGraphicsLoaded;
+
+            MainGame.Instance.AssetManager.LoadAssetBatchAsync(GlobalConfig.StartupAssetDefinitionFile, GlobalConfig.StartupAssetBatchId);
+        }
+
+        public void Dispose()
+        {
+            MainGame.Instance.AssetManager.AssetBatchLoadedEvent -= HandleAssetBatchLoaded;
+            MainGame.Instance.AssetManager.BatchAssetsLoadedEvent -= HandleBatchAssetsLoaded;
+            MainGame.Instance.GraphicsManager.GraphicBatchLoadedEvent -= HandleGraphicBatchLoaded;
+            MainGame.Instance.GraphicsManager.BatchGraphicsLoadedEvent -= HandleBatchGraphicsLoaded;
         }
 
         public void Draw()
@@ -51,66 +50,35 @@ namespace NinjaGame.Scenes
 
         public void Update(GameTime gameTime)
         {
-            Dictionary<int, Task> taskDict = null;
-            lock (_runningTasks)
-                taskDict = new Dictionary<int, Task>(_runningTasks);
+            // No op
+        }
 
-            List<int> ids = new List<int>();
-            foreach (var id in taskDict.Keys)
-                ids.Add(id);
+        public void HandleAssetBatchLoaded(IAssetBatch batch) 
+        {
+            if (batch.Id == GlobalConfig.StartupAssetBatchId)
+                MainGame.Instance.AssetManager.LoadBatchAssetsAsync(batch.Id);
+        }
 
-            if (ids.Count == 0 && !_assetsLoaded)
+        public void HandleBatchAssetsLoaded(IAssetBatch batch)
+        {
+            if (batch.Id == GlobalConfig.StartupAssetBatchId)
+                MainGame.Instance.GraphicsManager.LoadGraphicBatchAsync(GlobalConfig.StartupGraphicDefinitionFile, GlobalConfig.StartupGraphicBatchId);
+        }
+
+        public void HandleGraphicBatchLoaded(IGraphic2DBatch batch)
+        {
+            if (batch.Id == GlobalConfig.StartupGraphicBatchId)
+                MainGame.Instance.GraphicsManager.LoadBatchGraphicsAsync(batch.Id);
+        }
+
+        public void HandleBatchGraphicsLoaded(IGraphic2DBatch batch)
+        {
+            if (batch.Id == GlobalConfig.StartupGraphicBatchId)
             {
-                _assetsLoaded = true;
-                foreach (var gid in GlobalConfig.StartupGraphicIds)
-                {
-                    var t = Task.Factory.StartNew(() => LoadGraphic(GlobalConfig.DefaultGraphicsDefinitionFile, gid));
-                    _runningTasks.Add(_currentId, t);
-                    _currentId++;
-                }
-            }
-            else if (ids.Count == 0)
-            {
-                var mainMenu = new MainMenu();
+                var scene = new MainMenu();
                 MainGame.Instance.PopScene();
-                MainGame.Instance.PushScene(mainMenu);
+                MainGame.Instance.PushScene(scene);
             }
-
-            for (int i = 0; i < ids.Count; i++)
-            {
-                var task = taskDict[ids[i]];
-                if (task.IsCompleted)
-                {
-                    _runningTasks.Remove(ids[i]);
-                    _completedTasks.Add(task);
-
-                    if (ids[i] == _batchTaskId)
-                    {
-                        var batch = MainGame.Instance.AssetManager.GetAssetBatch(GlobalConfig.StartupAssetBatchId);
-                        foreach (var p in batch.GetAllFileIdPairs())
-                        {
-                            var t = Task.Factory.StartNew(() => LoadAsset(p.Item1, p.Item2, batch.Id));
-                            _runningTasks.Add(_currentId, t);
-                            _currentId++;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void LoadBatch()
-        {
-            MainGame.Instance.AssetManager.LoadAssetBatch(GlobalConfig.StartupAssetDefinitionFile, GlobalConfig.StartupAssetBatchId);
-        }
-
-        private void LoadAsset(string fileName, string id, string batchId)
-        {
-            MainGame.Instance.AssetManager.LoadAsset(fileName, id, batchId);
-        }
-
-        private void LoadGraphic(string fileName, string id)
-        {
-            MainGame.Instance.GraphicsManager.LoadGraphic(fileName, id);
         }
     }
 }

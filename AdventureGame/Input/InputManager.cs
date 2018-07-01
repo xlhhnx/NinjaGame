@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NinjaGame.Input
 {
@@ -26,36 +27,29 @@ namespace NinjaGame.Input
                 ctrl.Update();
         }
 
-        public void Subscribe_KeyChangeEvent(Action<Keys, ButtonStates> action)
+        public KeyboardController FirstKeyboardController()
         {
-            if (ReferenceEquals(null, action))
-                return;
-
-            foreach (var ctrl in _controllers)
-            {
-                var kbc = ctrl as KeyboardController;
-                if (ReferenceEquals(null, kbc))
-                    continue;
-
-                kbc.KeyStateChangeEvent += action;
-            }
+            var kbc = _controllers.Where(c => c is KeyboardController)
+                               .Select(c => c as KeyboardController)
+                               .FirstOrDefault();
+            return kbc;
         }
 
-        public void Unsubscribe_KeyChangeEvent(Action<Keys, ButtonStates> action)
+        public MouseController FirstMouseController()
         {
-            if (ReferenceEquals(null, action))
-                return;
-
-            foreach (var ctrl in _controllers)
-            {
-                var kbc = ctrl as KeyboardController;
-                if (ReferenceEquals(null, kbc))
-                    continue;
-
-                kbc.KeyStateChangeEvent -= action;
-            }
+            var mc = _controllers.Where(c => c is MouseController)
+                               .Select(c => c as MouseController)
+                               .FirstOrDefault();
+            return mc;
         }
 
-        // TODO: Create other Sub/Unsub methods
+        public GamepadController FirstGetGamepadController(int index)
+        {
+            var gpc = _controllers.Where(c => c is GamepadController)
+                               .Select(c => c as GamepadController)
+                               .Where(gp => gp.Index == index)
+                               .FirstOrDefault();
+            return gpc;
+        }
     }
 }

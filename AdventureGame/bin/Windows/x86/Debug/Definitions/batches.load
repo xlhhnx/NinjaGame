@@ -1,2 +1,4 @@
-﻿batch; 000001; Definitions\assets.load = { 000000000003 }
-batch; 000002; Definitions\assets.load = { 000000000001 , 000000000002 }
+﻿assetbatch; 000001; Definitions\assets.load = { 000000000003 }
+graphicbatch; 000001; Definitions\graphics.load = { 000000000003 }
+assetbatch; 000002; Definitions\assets.load = { 000000000001 , 000000000002 }
+graphicbatch; 000002; Definitions\graphics.load = { 000000000001 , 000000000002 }

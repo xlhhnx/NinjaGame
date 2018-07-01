@@ -37,7 +37,6 @@ C:\Users\Ben\Desktop\GameDev\AdventureGame\obj\x86\Debug\NinjaGame.csproj.CoreCo
 C:\Users\Ben\Desktop\GameDev\AdventureGame\obj\x86\Debug\NinjaGame.csproj.CopyComplete
 C:\Users\Ben\Desktop\GameDev\AdventureGame\obj\x86\Debug\AdventureGame.exe
 C:\Users\Ben\Desktop\GameDev\AdventureGame\obj\x86\Debug\AdventureGame.pdb
-C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\NinjaGame.csprojResolveAssemblyReference.cache
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\NinjaGame.csproj.CoreCompileInputs.cache
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Definitions\batches.load
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Content\default.xnb
@@ -46,8 +45,6 @@ C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Content\w
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Definitions\assets.load
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Definitions\graphics.load
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\config.ini
-C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\AdventureGame.exe
-C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\AdventureGame.pdb
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\MonoGame.Framework.dll
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\NAudio.dll
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\SharpDX.MediaFoundation.dll
@@ -66,5 +63,15 @@ C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\SharpDX.D
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\SharpDX.Direct3D11.xml
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\SharpDX.Direct2D1.xml
 C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\SharpDX.XInput.xml
-C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\AdventureGame.exe
-C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\AdventureGame.pdb
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Content\WhiteButtonUnfocused.xnb
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Content\Content\default.xnb
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Content\Content\SplashFont.xnb
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\Content\Content\white.xnb
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\SharpDX.Direct3D9.dll
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\SharpDX.Direct3D9.xml
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\NinjaGame.csproj.CopyComplete
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\NinjaGame.csprojAssemblyReference.cache
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\NinjaGame.exe
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\bin\Windows\x86\Debug\NinjaGame.pdb
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\NinjaGame.exe
+C:\Users\Ben\Desktop\Git\NinjaGame\AdventureGame\obj\x86\Debug\NinjaGame.pdb

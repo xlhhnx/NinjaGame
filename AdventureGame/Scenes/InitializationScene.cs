@@ -1,22 +1,43 @@
 ﻿using System.Threading.Tasks;
 using NinjaGame.Config;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using NinjaGame.Tasks;
+using NinjaGame.Assets.Batches;
+using NinjaGame.Graphics2D.Assets;
+using NinjaGame.Graphics2D.Batches;
+using System;
+using System.Windows.Forms;
+using NinjaGame.Common;
 
 namespace NinjaGame.Scenes
 {
     public class InitializationScene : IScene
     {
-        protected float _status;
-        protected Task _task;
-        protected StartupScene _startupScene;
+        protected TimeSpan _timeout;
+        protected TimeSpan _elapsedTime;
+
+        public InitializationScene(TimeSpan timeout)
+            : this()
+        {
+            _timeout = timeout;
+        }
 
         public InitializationScene()
         {
-            // MainGame.Instance.SetFullScreen(true);
-            MainGame.Instance.SetResolution();
+            _timeout = new TimeSpan(0, 0, 30);
+            _elapsedTime = new TimeSpan();
 
-            _task = new Task(Load);
-            _task.Start();
+            MainGame.Instance.SetScreenMode(ScreenMode.Borderless);
+            MainGame.Instance.SetResolution();
+            Console.WriteLine($"gamePos={MainGame.Instance.GraphicsDevice.Viewport.X} {MainGame.Instance.GraphicsDevice.Viewport.Y}");
+
+            MainGame.Instance.AssetManager.AssetBatchLoadedEvent += HandleAssetBatchLoaded;
+            MainGame.Instance.AssetManager.BatchAssetsLoadedEvent += HandleBatchAssetsLoaded;
+            MainGame.Instance.GraphicsManager.GraphicBatchLoadedEvent += HandleGraphicsBatchLoaded;
+            MainGame.Instance.GraphicsManager.BatchGraphicsLoadedEvent += HandleBatchGraphicsLoaded;
+
+            MainGame.Instance.AssetManager.LoadAssetBatchAsync(GlobalConfig.InitialAssetDefinitionFile, GlobalConfig.InitialAssetBatchId);
         }
 
         public void Draw()
@@ -26,19 +47,45 @@ namespace NinjaGame.Scenes
 
         public void Update(GameTime gameTime)
         {
-            if (_task.IsCompleted)
+            _elapsedTime += gameTime.ElapsedGameTime;
+            if (_elapsedTime > _timeout)
             {
-                MainGame.Instance.PopScene();
-                MainGame.Instance.PushScene(_startupScene);
+                MessageBox.Show("The application has failed to load. It will now close.", "Fatal Error", MessageBoxButtons.OK);
+                MainGame.Instance.Exit();
             }
         }
 
-        private void Load() 
+        public void HandleAssetBatchLoaded(IAssetBatch batch)
         {
-            MainGame.Instance.AssetManager.LoadAssetBatch(GlobalConfig.InitialAssetDefinitionFile, GlobalConfig.InitialAssetBatchId);
-            MainGame.Instance.AssetManager.LoadBatchAssets(GlobalConfig.InitialAssetBatchId);
+            if (batch.Id == GlobalConfig.InitialAssetBatchId)
+                MainGame.Instance.AssetManager.LoadBatchAssetsAsync(batch.Id);
+        }
 
-            _startupScene = new StartupScene();
+        public void HandleBatchAssetsLoaded(IAssetBatch batch)
+        {
+            if (batch.Id == GlobalConfig.InitialAssetBatchId)
+                MainGame.Instance.GraphicsManager.LoadGraphicBatchAsync(GlobalConfig.InitialGraphicDefinitionFile, GlobalConfig.InitialGraphicBatchId);
+        }
+
+        public void HandleGraphicsBatchLoaded(IGraphic2DBatch batch)
+        {
+            if (batch.Id == GlobalConfig.InitialGraphicBatchId)
+                MainGame.Instance.GraphicsManager.LoadBatchGraphicsAsync(batch.Id);
+        }
+
+        public void HandleBatchGraphicsLoaded(IGraphic2DBatch batch)
+        {
+            var startupScene = new StartupScene();
+            MainGame.Instance.PopScene();
+            MainGame.Instance.PushScene(startupScene);
+        }
+
+        public void Dispose()
+        {
+            MainGame.Instance.AssetManager.AssetBatchLoadedEvent -= HandleAssetBatchLoaded;
+            MainGame.Instance.AssetManager.BatchAssetsLoadedEvent -= HandleBatchAssetsLoaded;
+            MainGame.Instance.GraphicsManager.GraphicBatchLoadedEvent -= HandleGraphicsBatchLoaded;
+            MainGame.Instance.GraphicsManager.BatchGraphicsLoadedEvent -= HandleBatchGraphicsLoaded;
         }
     }
 }

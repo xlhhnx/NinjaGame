@@ -10,7 +10,7 @@ namespace NinjaGame.Graphics2D.Assets
         public override GraphicType GraphicType { get { return GraphicType.Image; } }
         public Texture2DAsset Texture2DAsset { get { return _texture2DAsset; } }
         public Rectangle SourceRectangle { get { return _sourceRectangle; } }
-        public Color Color { get { return _color; } }
+        public Color Color { get { return _color; } set { _color = value; } }
 
 
         protected Texture2DAsset _texture2DAsset;

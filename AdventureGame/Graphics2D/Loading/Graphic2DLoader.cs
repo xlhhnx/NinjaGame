@@ -1,5 +1,4 @@
-﻿using NinjaGame.Assets;
-using NinjaGame.Assets.Config;
+﻿using NinjaGame.Assets.Config;
 using NinjaGame.Assets.Management;
 using NinjaGame.Common.Extensions;
 using NinjaGame.Graphics2D.Assets;
@@ -7,207 +6,120 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NinjaGame.Graphics2D.Batches;
+using System.Threading.Tasks;
 
 namespace NinjaGame.Graphics2D.Loading
 {
     public class Graphic2DLoader : IGraphic2DLoader
     {
-        protected Dictionary<string, List<string>> _stagedFiles;
         protected IAssetManager _assetManager;
 
         public Graphic2DLoader(IAssetManager assetManager)
         {
-            _stagedFiles = new Dictionary<string, List<string>>();
             _assetManager = assetManager;
         }
 
-        public Text LoadText(string filePath, string id)
+        public IGraphic2D LoadGraphic(StagedGraphic stagedGraphic)
         {
-            var fileContents = new List<string>();
-
-            if (_stagedFiles.ContainsKey(filePath))
+            IGraphic2D graphic = null;
+            switch (stagedGraphic.Type)
             {
-                fileContents = _stagedFiles[filePath];
+                case (GraphicType.Image):
+                    graphic = ParseImage(stagedGraphic.FilePath, stagedGraphic.Id);
+                    break;
+                case (GraphicType.Effect):
+                    graphic = ParseEffect(stagedGraphic.FilePath, stagedGraphic.Id);
+                    break;
+                case (GraphicType.Sprite):
+                    graphic = ParseSprite(stagedGraphic.FilePath, stagedGraphic.Id);
+                    break;
+                case (GraphicType.Text):
+                    graphic = ParseText(stagedGraphic.FilePath, stagedGraphic.Id);
+                    break;
             }
-            else
+            return graphic;
+        }        
+
+        public IGraphic2DBatch LoadGraphicBatch(string filePath, string id)
+        {
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.ToLower().StartsWith("graphicbatch") && l.Contains(id))
+                                .FirstOrDefault();
+
+            var work = definition.Split(';');
+
+            var fileIdDict = new Dictionary<string, List<string>>();
+            for (int i = 0; i < work.Length; i++)
             {
-                fileContents = File.ReadAllLines(filePath).ToList();
+                var pair = work[i].Split('=');
+                if (pair.Length > 1 && pair[0].Trim().Length > 0)
+                {
+                    var ids = pair[1].Trim()
+                                .Trim('{','}')
+                                .Split(',')
+                                .Select(l => l.Trim())
+                                .ToList();
+
+                    fileIdDict.Add(pair[0].Trim(), ids);
+                }
             }
 
-            var text = fileContents.Where(l => l.Trim().Length > 0)
-                                      .Where(l => l.Trim().StartsWith("graphic"))
-                                      .Where(l => l.ToLower().Contains("text"))
-                                      .Where(l => l.Contains(id))
-                                      .Select(l => ParseGraphic(l))
-                                      .FirstOrDefault();
-            return text as Text;
+            var batch = new Graphic2DBatch(id);
+            batch.FileIdDict = fileIdDict;
+            return batch;
         }
 
-        public Image LoadImage(string filePath, string id)
+        public StagedGraphic StageGraphic(string filePath, string id)
         {
-            var fileContents = new List<string>();
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.ToLower().StartsWith("graphic") && l.Contains(id))
+                                .FirstOrDefault();
 
-            if (_stagedFiles.ContainsKey(filePath))
-            {
-                fileContents = _stagedFiles[filePath];
-            }
-            else
-            {
-                fileContents = File.ReadAllLines(filePath).ToList();
-            }
+            if (definition.Length == 0)
+                return new StagedGraphic();
 
-            var image = fileContents.Where(l => l.Trim().Length > 0)
-                                      .Where(l => l.Trim().StartsWith("graphic"))
-                                      .Where(l => l.ToLower().Contains("image"))
-                                      .Where(l => l.Contains(id))
-                                      .Select(l => ParseGraphic(l))
-                                      .FirstOrDefault();
-            return image as Image;
-        }
-
-        public Sprite LoadSprite(string filePath, string id)
-        {
-            var fileContents = new List<string>();
-
-            if (_stagedFiles.ContainsKey(filePath))
+            var work = definition.Split(';');
+            
+            GraphicType type = GraphicType.None;
+            for (int i = 0; i < work.Length; i++)
             {
-                fileContents = _stagedFiles[filePath];
-            }
-            else
-            {
-                fileContents = File.ReadAllLines(filePath).ToList();
+                var pair = work[i].Split('=');
+                if (pair[0].Trim().ToLower() == "graphic")
+                {
+                    type = ParseType(pair[1].Trim().ToLower());
+                    break;
+                }
             }
 
-            var sprite = fileContents.Where(l => l.Trim().Length > 0)
-                                      .Where(l => l.Trim().StartsWith("graphic"))
-                                      .Where(l => l.ToLower().Contains("sprite"))
-                                      .Where(l => l.Contains(id))
-                                      .Select(l => ParseGraphic(l))
-                                      .FirstOrDefault();
-            return sprite as Sprite;
-        }
+            if (type == GraphicType.None)
+                return new StagedGraphic();
 
-        public Effect LoadEffect(string filePath, string id)
-        {
-            var fileContents = new List<string>();
-
-            if (_stagedFiles.ContainsKey(filePath))
-            {
-                fileContents = _stagedFiles[filePath];
-            }
-            else
-            {
-                fileContents = File.ReadAllLines(filePath).ToList();
-            }
-
-            var effect = fileContents.Where(l => l.Trim().Length > 0)
-                                      .Where(l => l.Trim().StartsWith("graphic"))
-                                      .Where(l => l.ToLower().Contains("effect"))
-                                      .Where(l => l.Contains(id))
-                                      .Select(l => ParseGraphic(l))
-                                      .FirstOrDefault();
-            return effect as Effect;
+            var stagedGraphic = new StagedGraphic(id, filePath, type);
+            return stagedGraphic;
         }
 
         public IGraphic2D LoadGraphic(string filePath, string id)
         {
-            var fileContents = new List<string>();
+            var stagedGraphic = StageGraphic(filePath, id);
 
-            if (_stagedFiles.ContainsKey(filePath))
-            {
-                fileContents = _stagedFiles[filePath];
-            }
-            else
-            {
-                fileContents = File.ReadAllLines(filePath).ToList();
-            }
+            if (stagedGraphic.FilePath == string.Empty || stagedGraphic.Id == string.Empty || stagedGraphic.Type == GraphicType.None)
+                return null;
 
-            var graphic = fileContents.Where(l => l.Trim().Length > 0)
-                                      .Where(l => l.Trim().StartsWith("graphic"))
-                                      .Where(l => l.Contains(id))
-                                      .Select(l => ParseGraphic(l))
-                                      .FirstOrDefault();
+            var graphic = LoadGraphic(stagedGraphic);
             return graphic;
         }
 
-        public List<IGraphic2D> LoadGraphics(string filePath)
+        private Text ParseText(string filePath, string id)
         {
-            var fileContents = new List<string>();
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .FirstOrDefault();
 
-            if (_stagedFiles.ContainsKey(filePath))
-            {
-                fileContents = _stagedFiles[filePath];
-            }
-            else
-            {
-                fileContents = File.ReadAllLines(filePath).ToList();
-            }
+            var parameters = definition.Split(';')
+                                .Where(p => p.Contains("="))
+                                .ToList();
 
-            var graphics = fileContents.Where(l => l.Trim().Length > 0)
-                                       .Where(l => l.Trim().StartsWith("graphic"))
-                                       .Select(l => ParseGraphic(l))
-                                       .ToList();
-            return graphics;
-        }
-
-        public void StageFile(string filePath, bool overwrite = false)
-        {
-            if (!_stagedFiles.ContainsKey(filePath))
-            {
-                var fileContents = File.ReadAllLines(filePath).ToList();
-                _stagedFiles.Add(filePath, fileContents);
-            }
-            else if (overwrite)
-            {
-                var fileContents = File.ReadAllLines(filePath).ToList();
-                _stagedFiles[filePath] = fileContents;
-            }
-        }
-
-        public void UnstageFile(string filePath)
-        {
-            if (_stagedFiles.ContainsKey(filePath))
-            {
-                _stagedFiles.Remove(filePath);
-            }
-        }
-
-        private IGraphic2D ParseGraphic(string graphicDefinition)
-        {
-            BaseGraphic2D graphic = null;
-            var arguments = graphicDefinition.Split(';');
-            var parameters = arguments.Where(a => a.Contains("="))
-                                      .ToList();
-            
-            var id = "";
-            var type = "";
-            foreach (var p in parameters)
-            {
-                var pair = p.Split('=');
-                switch (pair[0].Trim().ToLower())
-                {
-                    case ("graphic"):
-                        type = pair[1].Trim().ToLower();
-                        break;
-                    case ("id"):
-                        id = pair[1].Trim();
-                        break;
-                }
-            }
-
-            switch (type.ToLower())
-            {
-                case ("text"): { graphic = ParseText(id, parameters); } break;
-                case ("image"): { graphic = ParseImage(id, parameters); } break;
-                case ("sprite"): { graphic = ParseSprite(id, parameters); } break;
-                case ("effect"): { graphic = ParseEffect(id, parameters); } break;
-            }
-
-            return graphic;
-        }
-
-        private Text ParseText(string id, List<string> parameters)
-        {
             var name = "";
             var spriteFontAssetId = "";
             Color color = new Color();
@@ -261,15 +173,21 @@ namespace NinjaGame.Graphics2D.Loading
 
             var spriteFontAsset = _assetManager.GetSpriteFontAsset(spriteFontAssetId);
             if (spriteFontAsset == null)
-            {
                 spriteFontAsset = AssetConfig.DefaultSpriteFontAsset;
-            }
 
             return new Text(id, spriteFontAsset, color, disabledColor, positionOffset, dimensions, fullText);
         }
 
-        private Image ParseImage(string id, List<string> parameters)
+        private Image ParseImage(string filePath, string id)
         {
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .FirstOrDefault();
+
+            var parameters = definition.Split(';')
+                                .Where(p => p.Contains("="))
+                                .ToList();
+
             var name = "";
             var texture2DAssetId = "";
             Color color = new Color();
@@ -335,15 +253,21 @@ namespace NinjaGame.Graphics2D.Loading
 
             var texture2DAsset = _assetManager.GetTexture2DAsset(texture2DAssetId);
             if (texture2DAsset is null)
-            {
                 texture2DAsset = AssetConfig.DefaultTexture2DAsset;
-            }
 
             return new Image(id, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible);
         }
 
-        private Sprite ParseSprite(string id, List<string> parameters)
+        private Sprite ParseSprite(string filePath, string id)
         {
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .FirstOrDefault();
+
+            var parameters = definition.Split(';')
+                                .Where(p => p.Contains("="))
+                                .ToList();
+
             var name = "";
             var texture2DAssetId = "";
             Color color = new Color();
@@ -433,16 +357,38 @@ namespace NinjaGame.Graphics2D.Loading
 
             var texture2DAsset = _assetManager.GetTexture2DAsset(texture2DAssetId);
             if (texture2DAsset == null)
-            {
                 texture2DAsset = AssetConfig.DefaultTexture2DAsset;
-            }
 
             return new Sprite(id, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, rows, columns, frameTime, looping, enabled, visible);
         }
 
-        private Effect ParseEffect(string id, List<string> parameters)
+        private Effect ParseEffect(string filePath, string id)
         {
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .FirstOrDefault();
+
+            var parameters = definition.Split(';')
+                                .Where(p => p.Contains("="))
+                                .ToList();
+
             return new Effect(id);
+        }
+        
+        private GraphicType ParseType(string typeString)
+        {
+            switch (typeString.Trim().ToLower())
+            {
+                case ("effect"):
+                    return GraphicType.Effect;
+                case ("image"):
+                    return GraphicType.Image;
+                case ("sprite"):
+                    return GraphicType.Sprite;
+                case ("text"):
+                    return GraphicType.Text;
+            }
+            return GraphicType.None;
         }
     }
 }

@@ -4,8 +4,8 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/Ben/Desktop/GameDev/AdventureGame/Content/default.spritefont</File>
-    <File>C:/Users/Ben/Desktop/GameDev/AdventureGame/Content/WhiteButtonUnfocused.png</File>
-    <File>C:/Users/Ben/Desktop/GameDev/AdventureGame/Content/SplashFont.spritefont</File>
+    <File>C:/Users/Ben/Desktop/Git/NinjaGame/AdventureGame/Content/default.spritefont</File>
+    <File>C:/Users/Ben/Desktop/Git/NinjaGame/AdventureGame/Content/SplashFont.spritefont</File>
+    <File>C:/Users/Ben/Desktop/Git/NinjaGame/AdventureGame/Content/white.png</File>
   </SourceFiles>
 </SourceFileCollection>

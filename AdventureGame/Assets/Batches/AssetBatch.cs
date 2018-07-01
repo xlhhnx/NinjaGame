@@ -13,7 +13,7 @@ namespace NinjaGame.Assets.Batches
 
         public ContentManager Content { get { return _contentManager; } }
 
-        public Dictionary<string, List<string>> FileIdDictionary
+        public Dictionary<string, List<string>> FileIdDict
         {
             get { return _fileIdDictionary; }
             set { _fileIdDictionary = value; }
@@ -51,22 +51,19 @@ namespace NinjaGame.Assets.Batches
 
         public void AddAssetDefinition(string filePath, string assetId)
         {
-            if (_fileIdDictionary.ContainsKey(filePath))
-            {
-                _fileIdDictionary[filePath].Add(assetId);
-            }
-            else
-            {
-                _fileIdDictionary.Add(filePath, new List<string>() { assetId });
-            }
+            if (!FileIdDict.ContainsKey(filePath))
+                FileIdDict.Add(filePath, new List<string>());
+
+            if (FileIdDict[filePath] is null)
+                FileIdDict[filePath] = new List<string>();
+
+            FileIdDict[filePath].Add(assetId);
         }
 
         public void AddAsset(IAsset asset)
         {
             if (!_assets.Contains(asset))
-            {
                 _assets.Add(asset);
-            }
         }
 
         public List<Tuple<string, string>> GetAllFileIdPairs()

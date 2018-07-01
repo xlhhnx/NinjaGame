@@ -8,8 +8,8 @@ namespace NinjaGame.Assets.Batches
     {
         string Id { get; }
         ContentManager Content { get; }
-        Dictionary<string, List<string>> FileIdDictionary { get; set; }
         List<IAsset> Assets { get; set; }
+        Dictionary<string, List<string>> FileIdDict { get; set; }
 
         void AddAssetDefinition(string filePath, string assetId);
         void AddAsset(IAsset asset);

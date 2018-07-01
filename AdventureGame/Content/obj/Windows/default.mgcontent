@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Ben/Desktop/GameDev/AdventureGame/Content/default.spritefont</SourceFile>
+  <SourceFile>C:/Users/Ben/Desktop/Git/NinjaGame/AdventureGame/Content/default.spritefont</SourceFile>
   <SourceTime>2017-03-01T10:05:30-05:00</SourceTime>
-  <DestFile>C:/Users/Ben/Desktop/GameDev/AdventureGame/Content/bin/Windows/default.xnb</DestFile>
-  <DestTime>2018-06-22T22:58:20.3434855-04:00</DestTime>
+  <DestFile>C:/Users/Ben/Desktop/Git/NinjaGame/AdventureGame/Content/bin/Windows/default.xnb</DestFile>
+  <DestTime>2018-06-27T17:12:33.6288055-04:00</DestTime>
   <Importer>FontDescriptionImporter</Importer>
   <ImporterTime>2017-03-01T10:05:36-05:00</ImporterTime>
   <Processor>FontDescriptionProcessor</Processor>

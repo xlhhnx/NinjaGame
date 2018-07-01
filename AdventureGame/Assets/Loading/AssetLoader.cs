@@ -30,9 +30,7 @@ namespace NinjaGame.Assets.Loading
             switch (stagedAsset.Type)
             {
                 case (AssetType.AudioAsset):
-                    {
-                        asset = new AudioAsset(stagedAsset.Id, new AudioFileReader(stagedAsset.FilePath));
-                    }
+                    asset = new AudioAsset(stagedAsset.Id, new AudioFileReader(stagedAsset.FilePath));
                     break;
                 case (AssetType.SpriteFontAsset):
                     {
@@ -59,7 +57,7 @@ namespace NinjaGame.Assets.Loading
         public IAssetBatch LoadBatch(string filePath, string id, IServiceProvider serviceProvider)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("batch") && l.Contains(id))
+                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains(id))
                                 .FirstOrDefault();
 
             var work = definition.Split(';');
@@ -81,7 +79,7 @@ namespace NinjaGame.Assets.Loading
             }
 
             var batch = new AssetBatch(id, serviceProvider);
-            batch.FileIdDictionary = fileIdDict;
+            batch.FileIdDict = fileIdDict;
             return batch;
         }
 
@@ -95,19 +93,25 @@ namespace NinjaGame.Assets.Loading
                 return new StagedAsset();
 
             var work = definition.Split(';');
-            var typeString = work[0].Split('=')[1].Trim().ToLower();
-            var type = ParseType(typeString);
-
-            if (type == AssetType.None)
-                return new StagedAsset();
 
             string fileName = "";
-            for (int i = 1; i < work.Length; i++)
+            AssetType type = AssetType.None;
+            for (int i = 0; i < work.Length; i++)
             {
                 var pair = work[i].Split('=');
-                if (pair[0].Trim().ToLower() == "filepath")
-                    fileName = pair[1].Trim();
+                switch (pair[0].Trim().ToLower())
+                {
+                    case ("filepath"):
+                        fileName = pair[1].Trim();
+                        break;
+                    case ("asset"):
+                        type = ParseType(pair[1].Trim().ToLower());
+                        break;
+                }
             }
+
+            if (fileName == string.Empty || type == AssetType.None)
+                return new StagedAsset();
 
             var stagedAsset = new StagedAsset(id, fileName, type, contentManager);
             return stagedAsset;

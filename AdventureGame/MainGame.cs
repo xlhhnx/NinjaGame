@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using NinjaGame.Graphics2D.Loading;
+using NinjaGame.Common;
 
 namespace NinjaGame
 {
@@ -20,7 +21,7 @@ namespace NinjaGame
         {
             get
             {
-                if (ReferenceEquals(null, _game))
+                if (_game is null)
                     _game = new MainGame();
 
                 return _game;
@@ -36,7 +37,7 @@ namespace NinjaGame
             get { return _sceneStack.Peek(); }
             set
             {
-                if (!ReferenceEquals(null, value))
+                if (!(value is null))
                     _nextScene = value;
             }
         }
@@ -59,7 +60,7 @@ namespace NinjaGame
             protected set { _graphics = value; }
         }
 
-        public InputManager InputManaget
+        public InputManager InputManager
         {
             get => _inputManager; 
             protected set => _inputManager = value;
@@ -79,7 +80,7 @@ namespace NinjaGame
             MainGame.Instance = this;
 
             Graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
 
             _sceneStack = new Stack<IScene>();
         }
@@ -89,8 +90,11 @@ namespace NinjaGame
 
             _inputManager = new InputManager();
             var keyboardController = new KeyboardController();
+            var mouseController = new MouseController();
             _inputManager.Controllers.Add(keyboardController);
-            _inputManager.Subscribe_KeyChangeEvent(
+            _inputManager.Controllers.Add(mouseController);
+
+            _inputManager.FirstKeyboardController().KeyStateChangeEvent += (
                 (k, b) =>
                 {
                     if (k == Microsoft.Xna.Framework.Input.Keys.Escape && b == ButtonStates.Pressed)
@@ -98,7 +102,7 @@ namespace NinjaGame
                 });
 
             _assetManager = new AssetManager(Services);
-            _graphicsManager = new Graphics2DManager(new Graphic2DLoader(_assetManager));
+            _graphicsManager = new Graphics2DManager(_assetManager);
 
             _sceneStack.Push(new InitializationScene());
 
@@ -132,8 +136,12 @@ namespace NinjaGame
             base.Draw(gameTime);
 
             if (popScene)
-                _sceneStack.Pop();
-            if (!ReferenceEquals(null, _nextScene))
+            {
+                var scene = _sceneStack.Pop();
+                scene.Dispose();
+            }
+
+            if (!(_nextScene is null))
                 _sceneStack.Push(_nextScene);
 
             _nextScene = null;
@@ -142,18 +150,14 @@ namespace NinjaGame
 
         public void UnloadAndExit()
         {
-            var result = MessageBox.Show("Any unsaved progress may be lost. Are you sure you want to exit?", "Confirm your selection.", MessageBoxButtons.YesNo);
-
-            if (result == DialogResult.Yes)
-            {
-                UnloadContent();
-                Exit();
-            }
-        }
-
+            UnloadContent();
+            Taskbar.Show();
+            Exit();
+        }    
+        
         public void PushScene(IScene nextScene)
         {
-            if (!ReferenceEquals(null, nextScene))
+            if (!(nextScene is null))
                 _nextScene = nextScene;
         }
 
@@ -193,9 +197,32 @@ namespace NinjaGame
             Graphics.ApplyChanges();
         }
 
-        public void SetFullScreen(bool fullScreen) 
+        public void SetScreenMode(ScreenMode screenMode)
         {
-            Graphics.IsFullScreen = fullScreen;
+            switch (screenMode)
+            {
+                case (ScreenMode.FullScreen):
+                    {
+                        Taskbar.Hide();
+                        Window.IsBorderless = false;
+                        Graphics.IsFullScreen = true;
+                    }
+                    break;
+                case (ScreenMode.Borderless):
+                    {
+                        Taskbar.Hide();
+                        Graphics.IsFullScreen = false;
+                        Window.IsBorderless = true;
+                    }
+                    break;
+                case (ScreenMode.Windowed):
+                    {
+                        Graphics.IsFullScreen = false;
+                        Window.IsBorderless = false;
+                        Taskbar.Show();
+                    }
+                    break;
+            }
         }
     }
 }
