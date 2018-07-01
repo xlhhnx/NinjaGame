@@ -57,7 +57,7 @@ namespace NinjaGame.Assets.Loading
         public IAssetBatch LoadBatch(string filePath, string id, IServiceProvider serviceProvider)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains(id))
+                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains($"id>{id}"))
                                 .FirstOrDefault();
 
             var work = definition.Split(';');
@@ -86,7 +86,7 @@ namespace NinjaGame.Assets.Loading
         public StagedAsset StageAsset(string filePath, string id, ContentManager contentManager)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("asset") && l.Contains(id))
+                                .Where(l => l.ToLower().StartsWith("asset") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             if (definition.Length == 0)

@@ -44,7 +44,7 @@ namespace NinjaGame.Graphics2D.Loading
         public IGraphic2DBatch LoadGraphicBatch(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("graphicbatch") && l.Contains(id))
+                                .Where(l => l.ToLower().StartsWith("graphicbatch") && l.Contains($"id>{id}"))
                                 .FirstOrDefault();
 
             var work = definition.Split(';');
@@ -73,7 +73,7 @@ namespace NinjaGame.Graphics2D.Loading
         public StagedGraphic StageGraphic(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("graphic") && l.Contains(id))
+                                .Where(l => l.ToLower().StartsWith("graphic") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             if (definition.Length == 0)
@@ -113,7 +113,7 @@ namespace NinjaGame.Graphics2D.Loading
         private Text ParseText(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .Where(l => l.Contains("graphic") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             var parameters = definition.Split(';')
@@ -138,7 +138,7 @@ namespace NinjaGame.Graphics2D.Loading
                             name = pair[1].ToLower();
                         }
                         break;
-                    case ("spritefontassetid"):
+                    case ("spritefontasset"):
                         {
                             spriteFontAssetId = pair[1].Trim().ToLower();
                         }
@@ -165,7 +165,7 @@ namespace NinjaGame.Graphics2D.Loading
                         break;
                     case ("fulltext"):
                         {
-                            fullText = pair[1].ToLower();
+                            fullText = pair[1];
                         }
                         break;
                 }
@@ -181,7 +181,7 @@ namespace NinjaGame.Graphics2D.Loading
         private Image ParseImage(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .Where(l => l.Contains("graphic") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             var parameters = definition.Split(';')
@@ -208,7 +208,7 @@ namespace NinjaGame.Graphics2D.Loading
                             name = pair[1].ToLower();
                         }
                         break;
-                    case ("texture2dassetid"):
+                    case ("texture2dasset"):
                         {
                             texture2DAssetId = pair[1].Trim().ToLower();
                         }
@@ -261,7 +261,7 @@ namespace NinjaGame.Graphics2D.Loading
         private Sprite ParseSprite(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .Where(l => l.Contains("graphic") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             var parameters = definition.Split(';')
@@ -292,7 +292,7 @@ namespace NinjaGame.Graphics2D.Loading
                             name = pair[1].ToLower();
                         }
                         break;
-                    case ("texture2dassetid"):
+                    case ("texture2dasset"):
                         {
                             texture2DAssetId = pair[1].Trim().ToLower();
                         }
@@ -365,7 +365,7 @@ namespace NinjaGame.Graphics2D.Loading
         private Effect ParseEffect(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.Contains("graphic") && l.Contains(id))
+                                .Where(l => l.Contains("graphic") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             var parameters = definition.Split(';')

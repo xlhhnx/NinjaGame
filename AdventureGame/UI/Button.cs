@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NinjaGame.Exceptions;
 using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Extensions;
 using NinjaGame.Input;
@@ -21,12 +22,13 @@ namespace NinjaGame.UI
             set
             {
                 _centered = value;
+                _buttonText.Center(Dimensions);
 
                 if (_centered)
                 {
-                    _blurredImage.Center();
-                    _focusedImage.Center();
-                    _clickedImage.Center();
+                    _blurredImage.Center(Dimensions);
+                    _focusedImage.Center(Dimensions);
+                    _clickedImage.Center(Dimensions);
                 }
             }
         }
@@ -56,6 +58,9 @@ namespace NinjaGame.UI
                 _blurredImage.Dimensions = value;
                 _focusedImage.Dimensions = value;
                 _clickedImage.Dimensions = value;
+                _buttonText.Dimensions = value;
+
+                Centered = Centered;
             }
         }
 
@@ -86,16 +91,19 @@ namespace NinjaGame.UI
 
         public Button(Vector2 position, Vector2 dimensions, Action action, Image blurredImage, Image focusedImage, Image clickedImage, Text text, bool centered = false)
         {
+            if (blurredImage is null || focusedImage is null || clickedImage is null || text is null)
+                throw new NullParameterException();
+
             Position = position;
             Action = action;
             _blurredImage = blurredImage;
             _focusedImage = focusedImage;
             _clickedImage = clickedImage;
             _buttonText = text;
+            _currentImage = _blurredImage;
             Dimensions = dimensions;
             Centered = centered;
 
-            _currentImage = _blurredImage;
             _gamepadController = MainGame.Instance.InputManager.FirstGetGamepadController(1);
             _keyboardController = MainGame.Instance.InputManager.FirstKeyboardController();
             _mouseController = MainGame.Instance.InputManager.FirstMouseController();
@@ -113,6 +121,7 @@ namespace NinjaGame.UI
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(_currentImage, Position);
+            spriteBatch.DrawString(_buttonText, Position);
         }
 
         public void Blur()

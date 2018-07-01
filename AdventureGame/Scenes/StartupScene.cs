@@ -8,22 +8,29 @@ using NinjaGame.Menus;
 using NinjaGame.Tasks;
 using NinjaGame.Assets.Batches;
 using NinjaGame.Graphics2D.Batches;
+using System;
 
 namespace NinjaGame.Scenes
 {
     public class StartupScene : IScene
-    {        
-        protected bool _assetsLoaded;
+    {
+        protected bool _fullyLoaded;
         protected Text _splashText;
         protected SpriteBatch _spriteBatch;
+        protected TimeSpan _splashTime;
+        protected TimeSpan _elapsedTime;
 
-        public StartupScene()
+        public StartupScene(TimeSpan splashTime)
         {
+            _splashTime = splashTime;
+
             _spriteBatch = new SpriteBatch(MainGame.Instance.GraphicsDevice);
+            _elapsedTime = new TimeSpan();
 
             var spriteFont = MainGame.Instance.AssetManager.GetSpriteFontAsset("000000000003");
             _splashText = MainGame.Instance.GraphicsManager.GetText("000000000003");
-            _splashText.Center();
+            CalcTime();
+            _splashText.Center(MainGame.Instance.GetScreenSize());
 
             MainGame.Instance.AssetManager.AssetBatchLoadedEvent += HandleAssetBatchLoaded;
             MainGame.Instance.AssetManager.BatchAssetsLoadedEvent += HandleBatchAssetsLoaded;
@@ -44,13 +51,20 @@ namespace NinjaGame.Scenes
         public void Draw()
         {
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(_splashText, MainGame.Instance.GetScreenCenter());
+            _spriteBatch.DrawString(_splashText, Vector2.Zero);
             _spriteBatch.End();
         }
 
         public void Update(GameTime gameTime)
         {
-            // No op
+            _elapsedTime += gameTime.ElapsedGameTime;
+            if (_elapsedTime > _splashTime && _fullyLoaded)
+            {
+                var scene = new MainMenu();
+                MainGame.Instance.PopScene();
+                MainGame.Instance.PushScene(scene);
+            }
+            CalcTime();
         }
 
         public void HandleAssetBatchLoaded(IAssetBatch batch) 
@@ -73,12 +87,15 @@ namespace NinjaGame.Scenes
 
         public void HandleBatchGraphicsLoaded(IGraphic2DBatch batch)
         {
-            if (batch.Id == GlobalConfig.StartupGraphicBatchId)
-            {
-                var scene = new MainMenu();
-                MainGame.Instance.PopScene();
-                MainGame.Instance.PushScene(scene);
-            }
+            _fullyLoaded = true;
+        }
+
+        private void CalcTime()
+        {
+            var timeRemaining = _splashTime - _elapsedTime;
+            var seconds = timeRemaining.Seconds.ToString();
+            var milliseconds = timeRemaining.Milliseconds.ToString("D3").Substring(0, 1);
+            _splashText.FullText = $"Splash! {seconds}.{milliseconds} seconds remaining...";
         }
     }
 }

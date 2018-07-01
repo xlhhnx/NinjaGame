@@ -22,6 +22,15 @@ namespace NinjaGame.Graphics2D.Assets
         public SpriteFontAsset SpriteFontAsset { get { return _spriteFontAsset; } }
 
         public Vector2 TextDimensions { get { return _spriteFontAsset.SpriteFont.MeasureString(_drawText); } }
+        public override Vector2 Dimensions
+        {
+            get => base.Dimensions; 
+            set
+            {
+                base.Dimensions = value;
+                FullText = TrimText(FullText, Dimensions);
+            }
+        }
 
         public Color Color
         {
@@ -88,9 +97,9 @@ namespace NinjaGame.Graphics2D.Assets
             return null;
         }
 
-        public override void Center()
+        public override void Center(Vector2 dimensions)
         {
-            PositionOffset = -(TextDimensions / 2);
+            PositionOffset = (dimensions / 2) - (TextDimensions / 2);
         }
     }
 }

@@ -12,6 +12,6 @@ namespace NinjaGame.Graphics2D.Assets
         Vector2 Dimensions { get; set; }
 
         IGraphic2D Copy();
-        void Center();
+        void Center(Vector2 dimensions);
     }
 }

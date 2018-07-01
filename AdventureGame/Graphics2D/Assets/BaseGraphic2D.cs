@@ -49,10 +49,10 @@ namespace NinjaGame.Graphics2D.Assets
         }
 
         public virtual void Unload() { /* No op */ }
-
-        public virtual void Center()
+        
+        public virtual void Center(Vector2 dimensions)
         {
-            PositionOffset = -(Dimensions / 2);
+            PositionOffset = (dimensions / 2) - (Dimensions / 2);
         }
 
         public abstract IGraphic2D Copy();

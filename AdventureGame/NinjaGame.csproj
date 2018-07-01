@@ -69,6 +69,7 @@
     <Compile Include="Common\Taskbar.cs" />
     <Compile Include="Common\Utility.cs" />
     <Compile Include="Config\GlobalConfig.cs" />
+    <Compile Include="Exceptions\NullParameterException.cs" />
     <Compile Include="Graphics2D\Assets\BaseGraphic2D.cs" />
     <Compile Include="Graphics2D\Assets\Effect.cs" />
     <Compile Include="Graphics2D\Assets\IGraphic2D.cs" />

@@ -75,7 +75,7 @@ namespace NinjaGame.Scenes
 
         public void HandleBatchGraphicsLoaded(IGraphic2DBatch batch)
         {
-            var startupScene = new StartupScene();
+            var startupScene = new StartupScene(new TimeSpan(0,0,5));
             MainGame.Instance.PopScene();
             MainGame.Instance.PushScene(startupScene);
         }
