@@ -44,13 +44,13 @@
     <StartupObject>NinjaGame.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assets\Batches\IAssetBatch.cs" />
     <Compile Include="Assets\Loading\IAssetLoader.cs" />
     <Compile Include="Assets\Batches\AssetBatch.cs" />
     <Compile Include="Assets\AssetType.cs" />
     <Compile Include="Assets\Assets\BaseAsset.cs" />
     <Compile Include="Assets\Config\AssetConfig.cs" />
     <Compile Include="Assets\Assets\IAsset.cs" />
-    <Compile Include="Assets\Batches\IAssetBatch.cs" />
     <Compile Include="Assets\Assets\AudioAsset.cs" />
     <Compile Include="Assets\Assets\SpriteFontAsset.cs" />
     <Compile Include="Assets\Assets\Texture2DAsset.cs" />
@@ -65,6 +65,8 @@
     <Compile Include="Common\Extensions\StringExtensions.cs" />
     <Compile Include="Common\Extensions\TaskExtensions.cs" />
     <Compile Include="Common\Extensions\Vector2Extensions.cs" />
+    <Compile Include="Common\ILoadBatch.cs" />
+    <Compile Include="Common\LoadBatch.cs" />
     <Compile Include="Common\ScreenMode.cs" />
     <Compile Include="Common\Taskbar.cs" />
     <Compile Include="Common\Utility.cs" />
@@ -76,15 +78,13 @@
     <Compile Include="Graphics2D\Assets\Image.cs" />
     <Compile Include="Graphics2D\Assets\Sprite.cs" />
     <Compile Include="Graphics2D\Assets\Text.cs" />
-    <Compile Include="Graphics2D\Batches\Graphic2DBatch.cs" />
-    <Compile Include="Graphics2D\Batches\IGraphic2DBatch.cs" />
     <Compile Include="Graphics2D\Config\Graphics2DConfig.cs" />
     <Compile Include="Graphics2D\Extensions\SpriteBatchExtensions.cs" />
     <Compile Include="Graphics2D\GraphicType.cs" />
     <Compile Include="Graphics2D\Loading\Graphic2DLoader.cs" />
     <Compile Include="Graphics2D\Loading\IGraphic2DLoader.cs" />
     <Compile Include="Graphics2D\Managers\Graphics2DManager.cs" />
-    <Compile Include="Graphics2D\Managers\IGraphicsManager.cs" />
+    <Compile Include="Graphics2D\Managers\IGraphics2DManager.cs" />
     <Compile Include="Graphics2D\StagedGraphic.cs" />
     <Compile Include="Input\ButtonStates.cs" />
     <Compile Include="Input\Controllers\GamepadController.cs" />
@@ -110,8 +110,16 @@
     <Compile Include="Tasks\LoadBatchGraphicsTask.cs" />
     <Compile Include="Tasks\LoadGraphicsBatchTask.cs" />
     <Compile Include="Tasks\LoadGraphicTask.cs" />
-    <Compile Include="UI\Button.cs" />
-    <Compile Include="UI\IButton.cs" />
+    <Compile Include="UI\Controls\Button.cs" />
+    <Compile Include="UI\Controls\IButton.cs" />
+    <Compile Include="UI\Controls\IControl.cs" />
+    <Compile Include="UI\ControlType.cs" />
+    <Compile Include="UI\Factory\ControlFactory.cs" />
+    <Compile Include="UI\Loading\ControlLoader.cs" />
+    <Compile Include="UI\Loading\IControlLoader.cs" />
+    <Compile Include="UI\Managers\IUserInterfaceManager.cs" />
+    <Compile Include="UI\Managers\UserInterfaceManager.cs" />
+    <Compile Include="UI\StagedControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

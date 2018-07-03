@@ -1,90 +1,24 @@
 ﻿using Microsoft.Xna.Framework.Content;
+using NinjaGame.Common;
 using System;
 using System.Collections.Generic;
 
 namespace NinjaGame.Assets.Batches
 {
-    public class AssetBatch : IAssetBatch
+    public class AssetBatch : LoadBatch<IAsset>, IAssetBatch
     {
-        public string Id
-        {
-            get { return _id; }
-        }
-
-        public ContentManager Content { get { return _contentManager; } }
-
-        public Dictionary<string, List<string>> FileIdDict
-        {
-            get { return _fileIdDictionary; }
-            set { _fileIdDictionary = value; }
-        }
-
-        public List<IAsset> Assets
-        {
-            get { return _assets; }
-            set { _assets = value; }
-        }
-
-        protected string _id;
-        protected bool _loaded;
-        protected ContentManager _contentManager;
-        // FilePath => List<Id>
-        protected Dictionary<string, List<string>> _fileIdDictionary;
-        protected List<IAsset> _assets;
-
+        public ContentManager Content { get; private set; }
 
         public AssetBatch(string id, IServiceProvider serviceProvider)
+            : base(id)
         {
-            _id = id;
-            _contentManager = new ContentManager(serviceProvider);
-            _fileIdDictionary = new Dictionary<string, List<string>>();
-            _assets = new List<IAsset>();
+            Content = new ContentManager(serviceProvider);
         }
 
         public AssetBatch(string id, IServiceProvider serviceProvider, string rootDirectory)
+            : base(id)
         {
-            _id = id;
-            _contentManager = new ContentManager(serviceProvider, rootDirectory);
-            _fileIdDictionary = new Dictionary<string, List<string>>();
-            _assets = new List<IAsset>();
-        }
-
-        public void AddAssetDefinition(string filePath, string assetId)
-        {
-            if (!FileIdDict.ContainsKey(filePath))
-                FileIdDict.Add(filePath, new List<string>());
-
-            if (FileIdDict[filePath] is null)
-                FileIdDict[filePath] = new List<string>();
-
-            FileIdDict[filePath].Add(assetId);
-        }
-
-        public void AddAsset(IAsset asset)
-        {
-            if (!_assets.Contains(asset))
-                _assets.Add(asset);
-        }
-
-        public List<Tuple<string, string>> GetAllFileIdPairs()
-        {
-            var pairs = new List<Tuple<string, string>>();
-            foreach (var file in _fileIdDictionary.Keys)
-            {
-                foreach (var id in _fileIdDictionary[file])
-                    pairs.Add(new Tuple<string, string>(file, id));
-            }
-            return pairs;
-        }
-
-        public void Unload()
-        {
-            _loaded = false;
-            foreach (IAsset a in _assets)
-            {
-                a.Unload();
-            }
-            _contentManager.Unload();
+            Content = new ContentManager(serviceProvider, rootDirectory);
         }
     }
 }

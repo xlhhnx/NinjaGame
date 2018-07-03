@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using NinjaGame.Graphics2D.Loading;
 using NinjaGame.Common;
+using NinjaGame.UI.Managers;
 
 namespace NinjaGame
 {
@@ -53,6 +54,8 @@ namespace NinjaGame
             get { return _graphicsManager; }
             protected set { _graphicsManager = value; }
         }
+        
+        public IUserInterfaceManager UIManager { get; set; }
 
         public GraphicsDeviceManager Graphics
         {

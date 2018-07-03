@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
-using NinjaGame.Config;
+﻿using NinjaGame.Config;
 using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NinjaGame.Menus;
-using NinjaGame.Tasks;
 using NinjaGame.Assets.Batches;
-using NinjaGame.Graphics2D.Batches;
 using System;
+using NinjaGame.Common;
 
 namespace NinjaGame.Scenes
 {
@@ -79,13 +77,13 @@ namespace NinjaGame.Scenes
                 MainGame.Instance.GraphicsManager.LoadGraphicBatchAsync(GlobalConfig.StartupGraphicDefinitionFile, GlobalConfig.StartupGraphicBatchId);
         }
 
-        public void HandleGraphicBatchLoaded(IGraphic2DBatch batch)
+        public void HandleGraphicBatchLoaded(ILoadBatch<IGraphic2D> batch)
         {
             if (batch.Id == GlobalConfig.StartupGraphicBatchId)
                 MainGame.Instance.GraphicsManager.LoadBatchGraphicsAsync(batch.Id);
         }
 
-        public void HandleBatchGraphicsLoaded(IGraphic2DBatch batch)
+        public void HandleBatchGraphicsLoaded(ILoadBatch<IGraphic2D> batch)
         {
             _fullyLoaded = true;
         }

@@ -1,11 +1,7 @@
-﻿using System.Threading.Tasks;
-using NinjaGame.Config;
+﻿using NinjaGame.Config;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using NinjaGame.Tasks;
 using NinjaGame.Assets.Batches;
 using NinjaGame.Graphics2D.Assets;
-using NinjaGame.Graphics2D.Batches;
 using System;
 using System.Windows.Forms;
 using NinjaGame.Common;
@@ -67,13 +63,13 @@ namespace NinjaGame.Scenes
                 MainGame.Instance.GraphicsManager.LoadGraphicBatchAsync(GlobalConfig.InitialGraphicDefinitionFile, GlobalConfig.InitialGraphicBatchId);
         }
 
-        public void HandleGraphicsBatchLoaded(IGraphic2DBatch batch)
+        public void HandleGraphicsBatchLoaded(ILoadBatch<IGraphic2D> batch)
         {
             if (batch.Id == GlobalConfig.InitialGraphicBatchId)
                 MainGame.Instance.GraphicsManager.LoadBatchGraphicsAsync(batch.Id);
         }
 
-        public void HandleBatchGraphicsLoaded(IGraphic2DBatch batch)
+        public void HandleBatchGraphicsLoaded(ILoadBatch<IGraphic2D> batch)
         {
             var startupScene = new StartupScene(new TimeSpan(0,0,5));
             MainGame.Instance.PopScene();

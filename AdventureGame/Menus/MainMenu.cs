@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Extensions;
 using NinjaGame.Scenes;
-using NinjaGame.UI;
+using NinjaGame.UI.Controls;
 
 namespace NinjaGame.Menus
 {

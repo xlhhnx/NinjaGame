@@ -1,5 +1,5 @@
-﻿using NinjaGame.Graphics2D.Assets;
-using NinjaGame.Graphics2D.Batches;
+﻿using NinjaGame.Common;
+using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Loading;
 using System;
 
@@ -7,8 +7,8 @@ namespace NinjaGame.Graphics2D.Managers
 {
     public interface IGraphics2DManager
     {
-        event Action<IGraphic2DBatch> GraphicBatchLoadedEvent;
-        event Action<IGraphic2DBatch> BatchGraphicsLoadedEvent;
+        event Action<ILoadBatch<IGraphic2D>> GraphicBatchLoadedEvent;
+        event Action<ILoadBatch<IGraphic2D>> BatchGraphicsLoadedEvent;
         event Action<IGraphic2D> GraphicLoadedEvent;
 
         IGraphic2DLoader Loader { get; set; }
@@ -23,10 +23,10 @@ namespace NinjaGame.Graphics2D.Managers
         void UnloadAll();
         void Recycle();
         bool ContainsBatch(string id);
-        bool ContainsBatch(IGraphic2DBatch batch);
+        bool ContainsBatch(ILoadBatch<IGraphic2D> batch);
         bool GraphicLoaded(string id);
         bool GraphicLoaded(IGraphic2D graphic);
-        IGraphic2DBatch GetBatch(string id);
+        ILoadBatch<IGraphic2D> GetBatch(string id);
         Image GetImage(string id);
         Sprite GetSprite(string id);
         Text GetText(string id);

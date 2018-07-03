@@ -1,19 +1,15 @@
 ﻿using Microsoft.Xna.Framework.Content;
+using NinjaGame.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace NinjaGame.Assets.Batches
 {
-    public interface IAssetBatch
+    public interface IAssetBatch : ILoadBatch<IAsset>
     {
-        string Id { get; }
         ContentManager Content { get; }
-        List<IAsset> Assets { get; set; }
-        Dictionary<string, List<string>> FileIdDict { get; set; }
-
-        void AddAssetDefinition(string filePath, string assetId);
-        void AddAsset(IAsset asset);
-        List<Tuple<string, string>> GetAllFileIdPairs();
-        void Unload();
     }
 }

@@ -2,20 +2,22 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NinjaGame.AssetManagement;
 using NinjaGame.Exceptions;
 using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Extensions;
 using NinjaGame.Input;
 using NinjaGame.Input.Controllers;
 
-namespace NinjaGame.UI
+namespace NinjaGame.UI.Controls
 {
-    public class Button : IButton
+    public class Button : IControl
     {
         public bool Focused { get; set; }
         public bool Clicked { get; set; }
-        public bool Visisble { get; set; }
+        public bool Visible { get; set; }
         public bool Enabled { get; set; }
+        public bool Loaded => true;
         public bool Centered
         {
             get { return _centered; }
@@ -32,6 +34,7 @@ namespace NinjaGame.UI
                 }
             }
         }
+        public string Id { get; set; }
         public string Text
         {
             get { return _buttonText.FullText; }
@@ -63,6 +66,7 @@ namespace NinjaGame.UI
                 Centered = Centered;
             }
         }
+        public AssetType Type => AssetType.None;
 
         protected Rectangle BoundingBox
         {
@@ -233,6 +237,11 @@ namespace NinjaGame.UI
             Focused = true;
             Clicked = true;
             _currentImage = _clickedImage;
+        }
+
+        public void Unload()
+        {
+            // No op
         }
     }
 }

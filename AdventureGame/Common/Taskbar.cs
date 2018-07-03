@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NinjaGame.Common
 {
-    public class Taskbar
+    public static class Taskbar
     {
         [DllImport("user32.dll")]
         private static extern int FindWindow(string className, string windowText);
@@ -21,8 +21,8 @@ namespace NinjaGame.Common
         private const int HIDE = 0;
         private const int SHOW = 1;
 
-        protected static int Handle { get { return FindWindow("Shell_TrayWnd", ""); } }
-        protected static int StartButtonHandle
+        private static int Handle { get { return FindWindow("Shell_TrayWnd", ""); } }
+        private static int StartButtonHandle
         {
             get
             {
@@ -43,7 +43,5 @@ namespace NinjaGame.Common
             ShowWindow(Handle, HIDE);
             ShowWindow(StartButtonHandle, HIDE);
         }
-
-        private Taskbar() { }
     }
 }

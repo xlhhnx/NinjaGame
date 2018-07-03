@@ -6,8 +6,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NinjaGame.Graphics2D.Batches;
-using System.Threading.Tasks;
+using NinjaGame.Common;
 
 namespace NinjaGame.Graphics2D.Loading
 {
@@ -41,7 +40,7 @@ namespace NinjaGame.Graphics2D.Loading
             return graphic;
         }        
 
-        public IGraphic2DBatch LoadGraphicBatch(string filePath, string id)
+        public ILoadBatch<IGraphic2D> LoadGraphicBatch(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
                                 .Where(l => l.ToLower().StartsWith("graphicbatch") && l.Contains($"id>{id}"))
@@ -65,7 +64,7 @@ namespace NinjaGame.Graphics2D.Loading
                 }
             }
 
-            var batch = new Graphic2DBatch(id);
+            var batch = new LoadBatch<IGraphic2D>(id);
             batch.FileIdDict = fileIdDict;
             return batch;
         }

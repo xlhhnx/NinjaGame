@@ -90,7 +90,7 @@ namespace NinjaGame.Assets.Management
                 return;
 
             var asset = _assetLoader.LoadAsset(filePath, id, batch.Content);
-            batch.AddAsset(asset);
+            batch.AddValue(asset);
             _assetDict.Add(id, asset);
             AssetLoadedEvent(asset);
         }
@@ -104,7 +104,7 @@ namespace NinjaGame.Assets.Management
 
             var t = Task.Run(() => _assetLoader.LoadAsset(filePath, id, batch.Content));
             var asset = await t;
-            batch.AddAsset(asset);
+            batch.AddValue(asset);
 
             if (!_assetDict.ContainsKey(id))
             {
@@ -162,7 +162,7 @@ namespace NinjaGame.Assets.Management
                     if (asset is null)
                         asset = _assetLoader.LoadAsset(assetFile, i, batch.Content);
 
-                    batch.AddAsset(asset);
+                    batch.AddValue(asset);
 
                     if (!_assetDict.ContainsKey(i))
                         _assetDict.Add(i, asset);
@@ -196,7 +196,7 @@ namespace NinjaGame.Assets.Management
             foreach (var t in tasks.InCompletionOrder())
             {
                 var asset = await t;
-                batch.AddAsset(asset);
+                batch.AddValue(asset);
 
                 if (!_assetDict.ContainsKey(asset.Id))
                 {
@@ -228,7 +228,7 @@ namespace NinjaGame.Assets.Management
             if (batch is null)
                 return;
 
-            foreach (var a in batch.Assets)
+            foreach (var a in batch.Values)
                 _assetDict.Remove(a.Id);
 
             batch.Unload();

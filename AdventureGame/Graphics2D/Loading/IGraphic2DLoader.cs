@@ -1,6 +1,5 @@
-﻿using NinjaGame.Graphics2D.Assets;
-using NinjaGame.Graphics2D.Batches;
-using System.Threading.Tasks;
+﻿using NinjaGame.Common;
+using NinjaGame.Graphics2D.Assets;
 
 namespace NinjaGame.Graphics2D.Loading
 {
@@ -8,7 +7,7 @@ namespace NinjaGame.Graphics2D.Loading
     {
         IGraphic2D LoadGraphic(string filePath, string id);
         IGraphic2D LoadGraphic(StagedGraphic stagedGraphic);
-        IGraphic2DBatch LoadGraphicBatch(string filePath, string id);
+        ILoadBatch<IGraphic2D> LoadGraphicBatch(string filePath, string id);
         StagedGraphic StageGraphic(string filePath, string id);
     }
 }
