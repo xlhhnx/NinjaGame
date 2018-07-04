@@ -1,5 +1,4 @@
-﻿using NinjaGame.AssetManagement;
-using NinjaGame.Assets.Batches;
+﻿using NinjaGame.Assets.Batches;
 using NinjaGame.Assets.Loading;
 using System;
 
@@ -12,13 +11,15 @@ namespace NinjaGame.Assets.Management
         event Action<IAsset> AssetLoadedEvent;
 
         IAssetLoader Loader { get; set; }
-
-        void LoadAsset(string filePath, string id, string batchId);
-        void LoadAssetBatch(string filePath, string id);
-        void LoadBatchAssets(string id);
-        void LoadAssetAsync(string filePath, string id, string batchId);
-        void LoadAssetBatchAsync(string filePath, string id);
-        void LoadBatchAssetsAsync(string id);
+        
+        void LoadAssetBatches(string filePath);
+        void LoadBatchAssets(IAssetBatch batch);
+        void LoadBatchAssetsById(string id);
+        void LoadBatchAssetsByName(string name);
+        void LoadAssetBatchesAsync(string filePath);
+        void LoadBatchAssetsAsync(IAssetBatch batch);
+        void LoadBatchAssetsAsyncById(string id);
+        void LoadBatchAssetsAsyncByName(string name);
         void UnloadBatch(string id);
         void UnloadAll();
         void Recycle();

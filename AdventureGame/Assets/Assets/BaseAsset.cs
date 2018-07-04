@@ -1,6 +1,4 @@
-﻿using NinjaGame.AssetManagement;
-
-namespace NinjaGame.Assets
+﻿namespace NinjaGame.Assets
 {
     public abstract class BaseAsset : IAsset
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Content;
-using NinjaGame.Common.Loading;
+using NinjaGame.Batches.Loading;
 using System;
 
 namespace NinjaGame.Assets.Batches

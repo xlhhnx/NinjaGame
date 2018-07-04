@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NinjaGame.Graphics2D.Assets;
-using NinjaGame.Graphics2D.Extensions;
 using NinjaGame.Scenes;
 using NinjaGame.UI.Controls;
+using NinjaGame.UI.Factories;
 
 namespace NinjaGame.Menus
 {
@@ -23,9 +23,8 @@ namespace NinjaGame.Menus
             focusedImage.Color = Color.Yellow;
             clickedImage.Color = Color.Red;
             bText.Color = Color.Black;
-            bText.DisabledColor = Color.DarkGray;
 
-            _button = new Button(MainGame.Instance.GetScreenCenter(), new Vector2(75,25), MainGame.Instance.UnloadAndExit, blurredImage, focusedImage, clickedImage, bText);
+            _button = ControlFactory.CreateDebugButton("Exit", MainGame.Instance.UnloadAndExit);
         }
 
         public void Update(GameTime gameTime)

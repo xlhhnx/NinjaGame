@@ -1,4 +1,4 @@
-﻿using NinjaGame.Common;
+﻿using NinjaGame.Batches.Loading;
 using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Loading;
 using System;
@@ -11,14 +11,16 @@ namespace NinjaGame.Graphics2D.Managers
         event Action<ILoadBatch<IGraphic2D>> BatchGraphicsLoadedEvent;
         event Action<IGraphic2D> GraphicLoadedEvent;
 
-        IGraphic2DLoader Loader { get; set; }
+        Graphic2DLoader Loader { get; set; }
 
-        void LoadGraphic(string filePath, string id, string batchId);
-        void LoadGraphicBatch(string filePath, string id);
-        void LoadBatchGraphics(string id);
-        void LoadGraphicAsync(string filePath, string id, string batchId);
-        void LoadGraphicBatchAsync(string filePath, string id);
-        void LoadBatchGraphicsAsync(string id);
+        void LoadBatches(string filePath);
+        void LoadBatchGraphics(ILoadBatch<IGraphic2D> batch);
+        void LoadBatchGrahpicsById(string id);
+        void LoadBatchGrahpicsByName(string name);
+        void LoadBatchesAsync(string filePath);
+        void LoadBatchGraphicsAsync(ILoadBatch<IGraphic2D> batch);
+        void LoadBatchGraphicsByIdAsync(string id);
+        void LoadBatchGraphicsByNameAsync(string name);
         void UnloadBatch(string id);
         void UnloadAll();
         void Recycle();

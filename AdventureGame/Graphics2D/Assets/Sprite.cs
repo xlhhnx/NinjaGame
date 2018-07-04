@@ -42,20 +42,18 @@ namespace NinjaGame.Graphics2D.Assets
         protected TimeSpan _elapsedTime;
 
 
-        public Sprite(string id, string name, Texture2DAsset texture2DAsset, Vector2 sourcePosition, Vector2 sourceDimensions, Color color, Vector2 positionOffset, Vector2 dimensions, int rows, int columns, int frameTime = -1, bool looping = true, bool enabled = true, bool visible = true)
-            : base(id, name, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible)
+        public Sprite(string id, string name, int rows, int columns, Texture2DAsset texture2DAsset, Vector2 sourcePosition, Vector2 sourceDimensions)
+            : base(id, name, texture2DAsset, sourcePosition, sourceDimensions)
         {
             _sourcePosition = sourcePosition;
             _sourceDimensions = sourceDimensions;
             _rows = rows;
             _columns = columns;
-            _looping = looping;
             _currentRow = 0;
             _currentColumn = 0;
             _elapsedTime = new TimeSpan();
 
-            if (frameTime > 0) _frameTime = frameTime;
-            else _frameTime = Graphics2DConfig.DefaultFrameTime;
+            _frameTime = Graphics2DConfig.DefaultFrameTime;
         }
 
         public virtual void ChangeFrame()
@@ -94,7 +92,17 @@ namespace NinjaGame.Graphics2D.Assets
 
         public override IGraphic2D Copy()
         {
-            return new Sprite(Id, Name, _texture2DAsset, _sourceRectangle.GetPosition(), _sourceRectangle.GetDimensions(), _color, _positionOffset, _dimensions, _rows, _columns, _frameTime, _looping, _enabled, _visible);
+            var sprite = new Sprite(Id, Name, _rows, _columns, _texture2DAsset, _sourceRectangle.GetPosition(), _sourceRectangle.GetDimensions())
+            {
+                Color = Color,
+                PositionOffset = PositionOffset,
+                Dimensions = Dimensions,
+                FrameTime = FrameTime,
+                Looping = Looping,
+                Enabled = Enabled,
+                Visible = Visible
+            };
+            return sprite;
         }
     }
 }

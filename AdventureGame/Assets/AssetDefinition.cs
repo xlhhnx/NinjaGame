@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Content;
-using NinjaGame.Common.Loading;
+using NinjaGame.Loading.Definitions;
 
 namespace NinjaGame.Assets
 {
@@ -7,8 +7,8 @@ namespace NinjaGame.Assets
     {
         public ContentManager Content { get; protected set; }
      
-        public AssetDefinition(string id, string name, string filePath, AssetType type, ContentManager content) 
-            : base(id, name, filePath, type)
+        public AssetDefinition(string id, string name, string assetFile, AssetType type, ContentManager content) 
+            :base(id, name, assetFile, type)
         {
             Content = content;
         }   

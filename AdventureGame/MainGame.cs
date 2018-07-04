@@ -1,5 +1,4 @@
-﻿using NinjaGame.Assets;
-using NinjaGame.Assets.Management;
+﻿using NinjaGame.Assets.Management;
 using NinjaGame.Config;
 using NinjaGame.Graphics2D.Managers;
 using NinjaGame.Input;
@@ -7,12 +6,8 @@ using NinjaGame.Input.Controllers;
 using NinjaGame.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using NinjaGame.Graphics2D.Loading;
 using NinjaGame.Common;
-using NinjaGame.UI.Managers;
 
 namespace NinjaGame
 {
@@ -54,8 +49,6 @@ namespace NinjaGame
             get { return _graphicsManager; }
             protected set { _graphicsManager = value; }
         }
-        
-        public IUserInterfaceManager UIManager { get; set; }
 
         public GraphicsDeviceManager Graphics
         {
@@ -104,7 +97,7 @@ namespace NinjaGame
                         UnloadAndExit();
                 });
 
-            _assetManager = new AssetManager(Services);
+            _assetManager = new AssetManager("", Services);
             _graphicsManager = new Graphics2DManager(_assetManager);
 
             _sceneStack.Push(new InitializationScene());

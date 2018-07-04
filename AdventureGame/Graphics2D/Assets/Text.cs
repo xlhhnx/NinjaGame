@@ -38,12 +38,6 @@ namespace NinjaGame.Graphics2D.Assets
             set { _color = value; }
         }
 
-        public Color DisabledColor
-        {
-            get { return _disabledColor; }
-            set { _disabledColor = value; }
-        }
-
 
         protected string _fullText;
         protected string _drawText;
@@ -52,23 +46,31 @@ namespace NinjaGame.Graphics2D.Assets
         protected SpriteFontAsset _spriteFontAsset;
 
 
-        public Text(string id, string name, SpriteFontAsset spriteFontAsset, Color color, Color disabledColor, Vector2 positionOffset, Vector2 dimensions, string fullText, bool visible = true, bool enabled = true)
+        public Text(string id, string name, SpriteFontAsset spriteFontAsset)
             : base(id, name)
         {
             _spriteFontAsset = spriteFontAsset;
-            _color = color;
-            _disabledColor = disabledColor;
-            _positionOffset = positionOffset;
-            _dimensions = dimensions;
-            _fullText = fullText;
-            _drawText = TrimText(fullText, _dimensions);
+            _color = Color.White;
+            _positionOffset = Vector2.Zero;
+            _dimensions = Vector2.Zero;
+            _fullText = "";
+            _drawText = TrimText(FullText, _dimensions);
             _visible = true;
             _enabled = true;
         }
 
         public override IGraphic2D Copy()
         {
-            return new Text(Id, Name, _spriteFontAsset, _color, _disabledColor, _positionOffset, _dimensions, _fullText);
+            var text = new Text(Id, Name, _spriteFontAsset)
+            {
+                Color = Color,
+                PositionOffset = PositionOffset,
+                Dimensions = Dimensions,
+                FullText = FullText,
+                Visible = Visible,
+                Enabled = Enabled
+            };
+            return text;
         }
 
         public string TrimText(string text, Vector2 dimensions)

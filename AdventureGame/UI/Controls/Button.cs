@@ -11,13 +11,12 @@ using NinjaGame.Assets;
 
 namespace NinjaGame.UI.Controls
 {
-    public class Button : IControl
+    public class Button : IButton
     {
         public bool Focused { get; set; }
         public bool Clicked { get; set; }
         public bool Visible { get; set; }
         public bool Enabled { get; set; }
-        public bool Loaded => true;
         public bool Centered
         {
             get { return _centered; }
@@ -34,13 +33,11 @@ namespace NinjaGame.UI.Controls
                 }
             }
         }
-        public string Id { get; set; }
         public string Text
         {
             get { return _buttonText.FullText; }
             set { _buttonText.FullText = value; }
         }
-        public string Name { get; protected set; }
         public string DisplayText { get { return _buttonText.DrawText; } }
         public Action Action { get; set; }
         public Vector2 Position
@@ -95,29 +92,24 @@ namespace NinjaGame.UI.Controls
         private KeyboardController _keyboardController;
         private MouseController _mouseController;
 
-        public Button(Vector2 position, Vector2 dimensions, Action action, Image blurredImage, Image focusedImage, Image clickedImage, Text text, string name = "button", bool centered = false)
+        public Button(Image blurredImage, Image focusedImage, Image clickedImage, Text buttonText)
         {
-            if (blurredImage is null || focusedImage is null || clickedImage is null || text is null)
+            if (blurredImage is null || focusedImage is null || clickedImage is null || buttonText is null)
                 throw new NullParameterException();
-
-            Position = position;
-            Action = action;
+            
             _blurredImage = blurredImage;
             _focusedImage = focusedImage;
             _clickedImage = clickedImage;
-            _buttonText = text;
+            _buttonText = buttonText;
             _currentImage = _blurredImage;
-            Name = name;
-            Dimensions = dimensions;
-            Centered = centered;
+            Position = Vector2.Zero;
+            Dimensions = Vector2.Zero;
+            Centered = false;
 
             _gamepadController = MainGame.Instance.InputManager.FirstGetGamepadController(1);
             _keyboardController = MainGame.Instance.InputManager.FirstKeyboardController();
             _mouseController = MainGame.Instance.InputManager.FirstMouseController();
             ResetEventHandlers();
-
-            Console.WriteLine($"BB={BoundingBox.X} {BoundingBox.Y} {BoundingBox.Width} {BoundingBox.Height}");
-            Console.WriteLine($"Pos={Position.X} {Position.Y} Dim={Dimensions.X} {Dimensions.Y}");
         }
 
         public void Update(GameTime gameTime)
@@ -179,7 +171,8 @@ namespace NinjaGame.UI.Controls
 
         public void Select()
         {
-            Action();
+            if(!(Action is null))
+                Action();
         }
 
         public void HandleKeyPress(Keys key, ButtonStates buttonState)

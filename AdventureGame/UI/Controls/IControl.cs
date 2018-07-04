@@ -4,7 +4,7 @@ using NinjaGame.Assets;
 
 namespace NinjaGame.UI.Controls
 {
-    public interface IControl :IAsset
+    public interface IControl
     {
         bool Focused { get; set; }
         bool Clicked { get; set; }

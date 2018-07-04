@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Assets\AssetDefinition.cs" />
     <Compile Include="Assets\Batches\IAssetBatch.cs" />
+    <Compile Include="Assets\Loading\AssetLoader.cs" />
     <Compile Include="Assets\Loading\IAssetLoader.cs" />
     <Compile Include="Assets\Batches\AssetBatch.cs" />
     <Compile Include="Assets\AssetType.cs" />
@@ -55,7 +56,6 @@
     <Compile Include="Assets\Assets\AudioAsset.cs" />
     <Compile Include="Assets\Assets\SpriteFontAsset.cs" />
     <Compile Include="Assets\Assets\Texture2DAsset.cs" />
-    <Compile Include="Assets\Loading\AssetLoader.cs" />
     <Compile Include="Assets\Management\AssetManager.cs" />
     <Compile Include="Assets\Management\IAssetManager.cs" />
     <Compile Include="Common\Bounding\BoundingBox.cs" />
@@ -65,10 +65,13 @@
     <Compile Include="Common\Extensions\StringExtensions.cs" />
     <Compile Include="Common\Extensions\TaskExtensions.cs" />
     <Compile Include="Common\Extensions\Vector2Extensions.cs" />
-    <Compile Include="Common\Loading\Definition.cs" />
-    <Compile Include="Common\Loading\IDefinition.cs" />
-    <Compile Include="Common\Loading\ILoadBatch.cs" />
-    <Compile Include="Common\Loading\LoadBatch.cs" />
+    <Compile Include="Graphics2D\Definitions\EffectDefinition.cs" />
+    <Compile Include="Graphics2D\Definitions\ImageDefinition.cs" />
+    <Compile Include="Graphics2D\Definitions\SpriteDefinition.cs" />
+    <Compile Include="Graphics2D\Definitions\TextDefinition.cs" />
+    <Compile Include="Graphics2D\Loading\Graphic2DLoader.cs" />
+    <Compile Include="Loading\Batches\ILoadBatch.cs" />
+    <Compile Include="Loading\Batches\LoadBatch.cs" />
     <Compile Include="Common\ScreenMode.cs" />
     <Compile Include="Common\Taskbar.cs" />
     <Compile Include="Common\Utility.cs" />
@@ -82,9 +85,8 @@
     <Compile Include="Graphics2D\Assets\Text.cs" />
     <Compile Include="Graphics2D\Config\Graphics2DConfig.cs" />
     <Compile Include="Graphics2D\Extensions\SpriteBatchExtensions.cs" />
+    <Compile Include="Graphics2D\Factories\GraphicFactory.cs" />
     <Compile Include="Graphics2D\GraphicType.cs" />
-    <Compile Include="Graphics2D\Loading\Graphic2DLoader.cs" />
-    <Compile Include="Graphics2D\Loading\IGraphic2DLoader.cs" />
     <Compile Include="Graphics2D\Managers\Graphics2DManager.cs" />
     <Compile Include="Graphics2D\Managers\IGraphics2DManager.cs" />
     <Compile Include="Input\ButtonStates.cs" />
@@ -97,6 +99,10 @@
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\Controllers\IController.cs" />
     <Compile Include="Input\MouseButtons.cs" />
+    <Compile Include="Loading\Definitions\Definition.cs" />
+    <Compile Include="Loading\Definitions\IDefinition.cs" />
+    <Compile Include="Loading\ILoader.cs" />
+    <Compile Include="Loading\Loader.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="Menus\MainMenu.cs" />
     <Compile Include="Program.cs" />
@@ -104,22 +110,11 @@
     <Compile Include="Scenes\IScene.cs" />
     <Compile Include="Scenes\InitializationScene.cs" />
     <Compile Include="Scenes\StartupScene.cs" />
-    <Compile Include="Tasks\GameTask.cs" />
-    <Compile Include="Tasks\LoadAssetBatchTask.cs" />
-    <Compile Include="Tasks\LoadAssetTask.cs" />
-    <Compile Include="Tasks\LoadBatchAssetsTask.cs" />
-    <Compile Include="Tasks\LoadBatchGraphicsTask.cs" />
-    <Compile Include="Tasks\LoadGraphicsBatchTask.cs" />
-    <Compile Include="Tasks\LoadGraphicTask.cs" />
     <Compile Include="UI\Controls\Button.cs" />
     <Compile Include="UI\Controls\IButton.cs" />
     <Compile Include="UI\Controls\IControl.cs" />
     <Compile Include="UI\ControlType.cs" />
-    <Compile Include="UI\Factory\ControlFactory.cs" />
-    <Compile Include="UI\Loading\ControlLoader.cs" />
-    <Compile Include="UI\Loading\IControlLoader.cs" />
-    <Compile Include="UI\Managers\IUserInterfaceManager.cs" />
-    <Compile Include="UI\Managers\UserInterfaceManager.cs" />
+    <Compile Include="UI\Factories\ControlFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -127,6 +122,9 @@
     </Reference>
     <Reference Include="NAudio, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\NAudio.1.8.4\lib\net35\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -145,7 +143,9 @@
     <None Include="Definitions\assets.load">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Definitions\controls.load" />
+    <None Include="Definitions\controls.load">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Definitions\graphics.load">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

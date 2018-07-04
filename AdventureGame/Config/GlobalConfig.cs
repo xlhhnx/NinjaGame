@@ -5,9 +5,10 @@ namespace NinjaGame.Config
 {
     public static class GlobalConfig
     {
-        public static string AssetDefinitionFile { get; set; }
-        public static string GrahpicDefinitionFile { get; set; }
-        public static string ControlDefinitionFile { get; set; }
+        public static string InitialAssetBatchFile { get; set; }
+        public static string InitialGraphicBatchFile { get; set; }
+        public static string AssetBatchFile { get; set; }
+        public static string GraphicBatchFile { get; set; }
 
         public static void Initialize()
         {
@@ -20,14 +21,17 @@ namespace NinjaGame.Config
                 var pair = l.Split('=');
                 switch (pair[0].Trim().ToLower())
                 {
-                    case ("assetdefinitionfile"):
-                        AssetDefinitionFile = pair[1].Trim();
+                    case ("initialassetbatchile"):
+                        InitialAssetBatchFile = pair[1].Trim();
                         break;
-                    case ("grahpicdefinitionfile"):
-                        GrahpicDefinitionFile = pair[1].Trim();
+                    case ("initialgraphicbatchfile"):
+                        InitialGraphicBatchFile = pair[1].Trim();
                         break;
-                    case ("controldefinitionfile"):
-                        ControlDefinitionFile = pair[1].Trim();
+                    case ("assetbatchfile"):
+                        AssetBatchFile = pair[1].Trim();
+                        break;
+                    case ("grahpicbatchfile"):
+                        GraphicBatchFile = pair[1].Trim();
                         break;
                 }
             }

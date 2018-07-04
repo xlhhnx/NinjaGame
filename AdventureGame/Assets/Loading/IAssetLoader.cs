@@ -1,17 +1,16 @@
 ﻿using NinjaGame.Assets.Batches;
-using Microsoft.Xna.Framework.Content;
+using NinjaGame.Loading;
 using System;
+using System.Collections.Generic;
 
 namespace NinjaGame.Assets.Loading
 {
     public interface IAssetLoader
     {
-        IAsset LoadAsset(string filePath, string id, ContentManager contentManager);
-        IAsset LoadAssetByName(string filePath, string name, ContentManager contentManager);
-        IAsset LoadAsset(AssetDefinition definition);
-        IAssetBatch LoadBatch(string filePath, string id, IServiceProvider serviceProvider);
-        IAssetBatch LoadBatchByName(string filePath, string name, IServiceProvider serviceProvider);
-        AssetDefinition LoadDefinition(string filePath, string id, ContentManager contentManager);
-        AssetDefinition LoadDefinitionByName(string filePath, string name, ContentManager contentManager);
+        string RootDirectory { get; set; }
+        IServiceProvider ServiceProvider { get; set; }
+        
+        List<IAssetBatch> LoadBatches(string filePath);
+        List<IAsset> LoadAssets(IAssetBatch batch);
     }
 }

@@ -1,12 +1,13 @@
 ﻿using NinjaGame.Common.Extensions;
 using NinjaGame.Assets.Management;
 using NinjaGame.Graphics2D.Assets;
-using NinjaGame.Graphics2D.Loading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NinjaGame.Common;
+using NinjaGame.Batches.Loading;
+using NinjaGame.Loading;
+using NinjaGame.Graphics2D.Loading;
 
 namespace NinjaGame.Graphics2D.Managers
 {
@@ -16,19 +17,14 @@ namespace NinjaGame.Graphics2D.Managers
         public event Action<ILoadBatch<IGraphic2D>> BatchGraphicsLoadedEvent = delegate { };
         public event Action<IGraphic2D> GraphicLoadedEvent = delegate { };
 
-        public IGraphic2DLoader Loader
-        {
-            get { return _graphicLoader; }
-            set { _graphicLoader = value; }
-        }
-
-        protected IGraphic2DLoader _graphicLoader;
+        public Graphic2DLoader Loader { get; set; }
+        
         protected Dictionary<string, ILoadBatch<IGraphic2D>> _graphicBatches;
         protected Dictionary<string, IGraphic2D> _graphicDict;
 
         public Graphics2DManager(IAssetManager assetManager)
         {
-            _graphicLoader = new Graphic2DLoader(assetManager);
+            Loader = new Graphic2DLoader();
             _graphicBatches = new Dictionary<string, ILoadBatch<IGraphic2D>>();
             _graphicDict = new Dictionary<string, IGraphic2D>();
         }
@@ -55,65 +51,6 @@ namespace NinjaGame.Graphics2D.Managers
         {
             _graphicDict.TryGetValue(id, out IGraphic2D graphic);
             return graphic.Copy() as Effect;
-        }
-
-        public void LoadGraphic(string filePath, string id, string batchId)
-        {
-            _graphicBatches.TryGetValue(batchId, out ILoadBatch<IGraphic2D> batch);
-
-            if (batch is null || _graphicDict.ContainsKey(id))
-                return;
-
-            var graphic = _graphicLoader.LoadGraphic(filePath, id);
-            batch.AddValue(graphic);
-            _graphicDict.Add(id, graphic);
-            GraphicLoadedEvent(graphic);
-        }
-
-        public void LoadGraphicBatch(string filePath, string id)
-        {
-            if (filePath is null || id is null || _graphicBatches.ContainsKey(id))
-                return;
-
-            var batch = _graphicLoader.LoadGraphicBatch(filePath, id);
-
-            if (batch is null)
-                return;
-
-            if (!_graphicBatches.ContainsKey(id))
-            {
-                _graphicBatches.Add(id, batch);
-                GraphicBatchLoadedEvent(batch);
-            }
-        }
-
-        public void LoadBatchGraphics(string id)
-        {
-            _graphicBatches.TryGetValue(id, out ILoadBatch<IGraphic2D> batch);
-
-            if (batch is null)
-                return;
-
-            foreach (var graphicFile in batch.FileIdDict.Keys)
-            {
-                var idList = batch.FileIdDict[graphicFile];
-                foreach (var i in idList)
-                {
-                    _graphicDict.TryGetValue(i, out IGraphic2D graphic);
-
-                    if (graphic is null)
-                        graphic = _graphicLoader.LoadGraphic(graphicFile, i);
-
-                    batch.AddValue(graphic);
-
-                    if (!_graphicDict.ContainsKey(i))
-                    {
-                        _graphicDict.Add(i, graphic);
-                        GraphicLoadedEvent(graphic);
-                    }
-                }
-                BatchGraphicsLoadedEvent(batch);
-            }
         }
 
         public void Recycle()
@@ -147,79 +84,6 @@ namespace NinjaGame.Graphics2D.Managers
                 _graphicDict.Remove(g.Id);
         }
 
-        public async void LoadGraphicAsync(string filePath, string id, string batchId)
-        {
-            _graphicBatches.TryGetValue(batchId, out ILoadBatch<IGraphic2D> batch);
-
-            if (batch is null)
-                return;
-
-            var t = Task.Run(() => _graphicLoader.LoadGraphic(filePath, id));
-            var graphic = await t;
-            batch.AddValue(graphic);
-
-            if (!_graphicDict.ContainsKey(id))
-            {
-                _graphicDict.Add(id, graphic);
-                GraphicLoadedEvent(graphic);
-            }
-        }
-
-        public async void LoadGraphicBatchAsync(string filePath, string id)
-        {
-            if (filePath is null || id is null || _graphicBatches.ContainsKey(id))
-                return;
-
-            var t = Task.Run(() => _graphicLoader.LoadGraphicBatch(filePath, id));
-            var batch = await t;
-
-            if (batch is null)
-                return;
-
-            if (!_graphicBatches.ContainsKey(id))
-            {
-                _graphicBatches.Add(id, batch);
-                GraphicBatchLoadedEvent(batch);
-            }
-        }
-
-        public async void LoadBatchGraphicsAsync(string id)
-        {
-            _graphicBatches.TryGetValue(id, out ILoadBatch<IGraphic2D> batch);
-
-            if (batch is null)
-                return;
-
-            var tasks = new List<Task<IGraphic2D>>();
-            foreach (var graphicFile in batch.FileIdDict.Keys)
-            {
-                var idList = batch.FileIdDict[graphicFile];
-                foreach (var i in idList)
-                {
-                    _graphicDict.TryGetValue(i, out IGraphic2D graphic);
-
-                    if (graphic is null)
-                    {
-                        var t = Task.Run(() => _graphicLoader.LoadGraphic(graphicFile, i));
-                        tasks.Add(t);
-                    }
-                }
-            }
-
-            foreach (var t in tasks.InCompletionOrder())
-            {
-                var graphic = await t;
-                batch.AddValue(graphic);
-
-                if (!_graphicDict.ContainsKey(graphic.Id))
-                {
-                    _graphicDict.Add(graphic.Id, graphic);
-                    GraphicLoadedEvent(graphic);
-                }
-            }
-            BatchGraphicsLoadedEvent(batch);
-        }
-
         public bool ContainsBatch(string id)
         {
             return _graphicBatches.ContainsKey(id);
@@ -238,6 +102,116 @@ namespace NinjaGame.Graphics2D.Managers
         public bool GraphicLoaded(IGraphic2D graphic)
         {
             return _graphicDict.ContainsKey(graphic.Id);
+        }
+
+        public void LoadBatches(string filePath)
+        {
+            var batches = Loader.LoadBatches(filePath);
+            
+            if (batches is null)
+                return;
+
+            foreach (var b in batches)
+            {
+                if (!_graphicBatches.ContainsKey(b.Id))
+                {
+                    _graphicBatches.Add(b.Id, b);
+                    GraphicBatchLoadedEvent(b);
+                }
+            }
+        }
+
+        public void LoadBatchGrahpicsById(string id)
+        {
+            if (_graphicBatches.TryGetValue(id, out var batch))
+            {
+                LoadBatchGraphics(batch);
+            }
+        }
+
+        public async void LoadBatchesAsync(string filePath)
+        {
+            var task = Task.Run(() => Loader.LoadBatches(filePath));
+            var batches = await task;
+            
+            if (batches is null)
+                return;
+
+            foreach (var b in batches)
+            {
+                if (!_graphicBatches.ContainsKey(b.Id))
+                {
+                    _graphicBatches.Add(b.Id, b);
+                    GraphicBatchLoadedEvent(b);
+                }
+            }
+        }
+
+        public void LoadBatchGraphicsByIdAsync(string id)
+        {
+            if (_graphicBatches.TryGetValue(id, out var batch))
+            {
+                LoadBatchGraphicsAsync(batch);
+            }
+        }
+
+        public void LoadBatchGraphics(ILoadBatch<IGraphic2D> batch)
+        {
+            var graphics = Loader.LoadGraphics(batch);
+            foreach (var g in graphics)
+            {
+                if (!batch.Values.Contains(g))
+                    batch.Values.Add(g);
+
+                if (!_graphicDict.ContainsKey(g.Id))
+                {
+                    _graphicDict.Add(g.Id, g);
+                    GraphicLoadedEvent(g);
+                }
+            }
+            BatchGraphicsLoadedEvent(batch);
+        }
+
+        public void LoadBatchGrahpicsByName(string name)
+        {
+            foreach (var id in _graphicBatches.Keys)
+            {
+                if (_graphicBatches[id].Name == name)
+                {
+                    LoadBatchGraphics(_graphicBatches[id]);
+                    break;
+                }
+            }
+        }
+
+        public async void LoadBatchGraphicsAsync(ILoadBatch<IGraphic2D> batch)
+        {
+            var task = Task.Run(() => Loader.LoadGraphics(batch));
+            var graphics = await task;
+            foreach (var g in graphics)
+            {
+                if (!batch.Values.Contains(g))
+                    batch.Values.Add(g);
+
+                if (!_graphicDict.ContainsKey(g.Id))
+                {
+                    _graphicDict.Add(g.Id, g);
+                    GraphicLoadedEvent(g);
+                }
+            }
+            BatchGraphicsLoadedEvent(batch);
+        }
+
+        public void LoadBatchGraphicsByNameAsync(string name)
+        {
+            foreach (var id in _graphicBatches.Keys)
+            {
+                if (_graphicBatches[id].Name == name)
+                {
+                    LoadBatchGraphicsAsync(_graphicBatches[id]);
+                    break;
+                }
+            }
         }
     }
 }

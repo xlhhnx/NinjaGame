@@ -1,257 +1,134 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using NinjaGame.Assets.Batches;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using NAudio.Wave;
+using Newtonsoft.Json;
+using NinjaGame.Assets.Batches;
+using NinjaGame.Batches.Loading;
+using NinjaGame.Loading;
+using NinjaGame.Loading.Definitions;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace NinjaGame.Assets.Loading
 {
     public class AssetLoader : IAssetLoader
     {
-        protected Dictionary<string, string> _nameIdDict;
-        protected Dictionary<string, AssetDefinition> _definitions;
+        public string RootDirectory { get; set; }
+        public IServiceProvider ServiceProvider { get; set; }
 
-        public AssetLoader()
+        public AssetLoader(string rootDirectory, IServiceProvider serviceProvider)
         {
-            _nameIdDict = new Dictionary<string, string>();
-            _definitions = new Dictionary<string, AssetDefinition>();
+            RootDirectory = rootDirectory;
+            ServiceProvider = serviceProvider;
         }
 
-        public IAsset LoadAsset(string filePath, string id, ContentManager contentManager)
+        public List<IAsset> LoadAssets(IAssetBatch batch)
         {
-            var definition = LoadDefinition(filePath, id, contentManager);
-
-            if (definition is null)
-                return null;
-
-            var asset = LoadAsset(definition);
-            return asset;
-        }
-
-        public IAsset LoadAsset(AssetDefinition definition)
-        {
-            IAsset asset = null;
-
-            switch (definition.Type)
+            var assets = new List<IAsset>();
+            foreach (var file in batch.Files)
             {
-                case (AssetType.AudioAsset):
-                    asset = new AudioAsset(definition.Id, definition.Name, new AudioFileReader(definition.FilePath));
-                    break;
-                case (AssetType.SpriteFontAsset):
-                    {
-                        var sf = definition.Content.Load<SpriteFont>(definition.FilePath);
-                        asset = new SpriteFontAsset(definition.Id, definition.Name, sf);
-                    }
-                    break;
-                case (AssetType.Texture2DAsset):
-                    {
-                        var td = definition.Content.Load<Texture2D>(definition.FilePath);
-                        asset = new Texture2DAsset(definition.Id, definition.Name, td);
-                    }
-                    break;
+                var tmpAssets = LoadAssets(file, batch.Content);
+
+                if(tmpAssets != null)
+                    assets.AddRange(tmpAssets);
             }
-            return asset;
+            return assets;
         }
 
-        public IAsset LoadAssetByName(string filePath, string name, ContentManager contentManager)
+        public List<IAssetBatch> LoadBatches(string filePath)
         {
-            var stagedAsset = LoadDefinitionByName(filePath, name, contentManager);
-
-            if (stagedAsset.Content == null || stagedAsset.Type == AssetType.None || stagedAsset.Id == string.Empty || stagedAsset.FilePath == string.Empty)
-                return null;
-
-            var asset = LoadAsset(stagedAsset);
-            return asset;
-        }
-
-        public IAssetBatch LoadBatch(string filePath, string id, IServiceProvider serviceProvider)
-        {
-            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains($"id={id}"))
-                                .FirstOrDefault();
-
-            var work = definition.Split(';');
-
-            var name = "";
-            var fileIdDict = new Dictionary<string, List<string>>();
-            for (int i = 0; i < work.Length; i++)
+            var contents = "";
+            try
             {
-                if (work[i].Contains('='))
-                {
-                    var pair = work[i].Split('=');
-                    if (pair[0].Trim().ToLower() == "name")
-                        name = pair[1].Trim();
-                }
-                else if (work[i].Contains(':'))
-                {
-                    var pair = work[i].Split(':');
-                    var ids = pair[1].Trim()
-                                .Trim('{','}')
-                                .Split(',')
-                                .Select(l => l.Trim())
-                                .ToList();
-
-                    fileIdDict.Add(pair[0].Trim(), ids);
-                }
+                contents = File.ReadAllText(filePath);
+            }
+            catch (FileNotFoundException ex)
+            {
+                // TODO: Log ex
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // TODO: Log ex
+                Console.WriteLine(ex.Message);
+                return null;
             }
 
-            var batch = new AssetBatch(id, name, serviceProvider) { FileIdDict = fileIdDict };
-            return batch;
+            var batches = new List<IAssetBatch>();
+            try
+            {
+                var tmpBatches = JsonConvert.DeserializeObject<List<AssetBatch>>(contents);
+                foreach (var b in tmpBatches)
+                    batches.Add(b);
+            }
+            catch (JsonException ex)
+            {
+                // TODO: Log ex
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            return batches;
         }
 
-        public IAssetBatch LoadBatchByName(string filePath, string name, IServiceProvider serviceProvider)
+        private List<IAsset> LoadAssets(string fileName, ContentManager content)
         {
-            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains($"name={name}"))
-                                .FirstOrDefault();
-
-            var work = definition.Split(';');
-
-            var id = "";
-            var fileIdDict = new Dictionary<string, List<string>>();
-            for (int i = 0; i < work.Length; i++)
+            var fileContents = "";
+            try
             {
-                if (work[i].Contains('='))
-                {
-                    var pair = work[i].Split('=');
-                    if (pair[0].Trim().ToLower() == "id")
-                        id = pair[1].Trim();
-                }
-                else if (work[i].Contains(':'))
-                {
-                    var pair = work[i].Split(':');
-                    var ids = pair[1].Trim()
-                                .Trim('{','}')
-                                .Split(',')
-                                .Select(l => l.Trim())
-                                .ToList();
-
-                    fileIdDict.Add(pair[0].Trim(), ids);
-                }
+                fileContents = File.ReadAllText(fileName);
+            }
+            catch (FileNotFoundException ex)
+            {
+                // TODO: Log ex
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+                        
+            var definitions = new List<AssetDefinition>();
+            try
+            {
+                var tmpDefs = JsonConvert.DeserializeObject<List<Definition<AssetType>>>(fileContents);
+                foreach (var t in tmpDefs)
+                    definitions.Add(
+                        new AssetDefinition(t.Id, t.Name, t.AssetFile, t.Type, content)
+                    );
+            }
+            catch (JsonException ex)
+            {
+                // TODO: Log ex
+                Console.WriteLine(ex.Message);
+                return null;
             }
 
-            var batch = new AssetBatch(id, name, serviceProvider) { FileIdDict = fileIdDict };
-            return batch;
-        }
-
-        public AssetDefinition LoadDefinition(string filePath, string id, ContentManager contentManager)
-        {
-            _definitions.TryGetValue(id, out var def);
-            if (!(def is null))
-                return def;
-
-            var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("asset") && l.Contains($"id={id}"))
-                                .FirstOrDefault();
-
-            if (line.Length == 0)
-                return null;
-
-            var work = line.Split(';');
-
-            var name = "";
-            var fileName = "";
-            AssetType type = AssetType.None;
-            for (int i = 0; i < work.Length; i++)
+            var assets = new List<IAsset>();
+            foreach (var def in definitions)
             {
-                var pair = work[i].Split('=');
-                switch (pair[0].Trim().ToLower())
+                IAsset asset = null;
+                switch (def.Type)
                 {
-                    case ("filepath"):
-                        fileName = pair[1].Trim();
+                    case (AssetType.AudioAsset):
+                        asset = new AudioAsset(def.Id, def.Name, new AudioFileReader(def.AssetFile));
                         break;
-                    case ("asset"):
-                        type = ParseType(pair[1].Trim().ToLower());
+                    case (AssetType.SpriteFontAsset):
+                        {
+                            var sf = def.Content.Load<SpriteFont>(def.AssetFile);
+                            asset = new SpriteFontAsset(def.Id, def.Name, sf);
+                        }
                         break;
-                    case ("name"):
-                        id = pair[1].Trim().ToLower();
+                    case (AssetType.Texture2DAsset):
+                        {
+                            var td = def.Content.Load<Texture2D>(def.AssetFile);
+                            asset = new Texture2DAsset(def.Id, def.Name, td);
+                        }
                         break;
                 }
+                if (!(asset is null))
+                    assets.Add(asset);
             }
 
-            if (fileName == string.Empty || type == AssetType.None)
-                return null;
-
-            var definition = new AssetDefinition(id, name, fileName, type, contentManager);
-
-            if (!(definition is null) && !_definitions.ContainsKey(id))
-                _definitions.Add(id, definition);
-            
-            if (!_nameIdDict.ContainsKey(definition.Name))
-                _nameIdDict.Add(definition.Name, definition.Id);
-
-            return definition;
-        }
-
-        public AssetDefinition LoadDefinitionByName(string filePath, string name, ContentManager contentManager)
-        {
-            _nameIdDict.TryGetValue(name, out var tmpId);
-            if (!(tmpId is null))
-            {
-                _definitions.TryGetValue(tmpId, out var def);
-                if (!(def is null))
-                    return def;
-            }
-
-            var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("asset") && l.Contains($"name={name}"))
-                                .FirstOrDefault();
-
-            if (line.Length == 0)
-                return null;
-
-            var work = line.Split(';');
-
-            var id = "";
-            var fileName = "";
-            AssetType type = AssetType.None;
-            for (int i = 0; i < work.Length; i++)
-            {
-                var pair = work[i].Split('=');
-                switch (pair[0].Trim().ToLower())
-                {
-                    case ("filepath"):
-                        fileName = pair[1].Trim();
-                        break;
-                    case ("asset"):
-                        type = ParseType(pair[1].Trim().ToLower());
-                        break;
-                    case ("id"):
-                        id = pair[1].Trim();
-                        break;
-                }
-            }
-
-            if (fileName == string.Empty || type == AssetType.None)
-                return null;
-
-            var definition = new AssetDefinition(id, name, fileName, type, contentManager);
-            
-            if (!(definition is null) && !_definitions.ContainsKey(id))
-                _definitions.Add(id, definition);
-            
-            if (!_nameIdDict.ContainsKey(definition.Name))
-                _nameIdDict.Add(definition.Name, definition.Id);
-
-            return definition;
-        }
-
-        private AssetType ParseType(string typeString)
-        {
-            switch (typeString.Trim().ToLower())
-            {
-                case ("texture2d"):
-                    return AssetType.Texture2DAsset;
-                case ("spritefont"):
-                    return AssetType.SpriteFontAsset;
-                case ("audio"):
-                    return AssetType.AudioAsset;
-            }
-            return AssetType.None;
+            return assets;
         }
     }
 }
-

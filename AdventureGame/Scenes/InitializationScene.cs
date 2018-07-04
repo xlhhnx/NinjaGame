@@ -5,6 +5,7 @@ using NinjaGame.Graphics2D.Assets;
 using System;
 using System.Windows.Forms;
 using NinjaGame.Common;
+using NinjaGame.Batches.Loading;
 
 namespace NinjaGame.Scenes
 {
@@ -39,7 +40,7 @@ namespace NinjaGame.Scenes
             MainGame.Instance.GraphicsManager.GraphicBatchLoadedEvent += HandleGraphicsBatchLoaded;
             MainGame.Instance.GraphicsManager.BatchGraphicsLoadedEvent += HandleBatchGraphicsLoaded;
 
-            MainGame.Instance.AssetManager.LoadAssetBatchByNameAsync(GlobalConfig.AssetDefinitionFile, "initial");
+            MainGame.Instance.AssetManager.LoadAssetBatchesAsync(GlobalConfig.InitialAssetBatchFile);
         }
 
         public void Draw()
@@ -59,20 +60,20 @@ namespace NinjaGame.Scenes
 
         public void HandleAssetBatchLoaded(IAssetBatch batch)
         {
-            if (batch.Name == "initial")
-                MainGame.Instance.AssetManager.LoadBatchAssetsAsync(batch.Id);
+            if (batch.Name == "Initial")
+                MainGame.Instance.AssetManager.LoadBatchAssetsAsyncById(batch.Id);
         }
 
         public void HandleBatchAssetsLoaded(IAssetBatch batch)
         {
-            if (batch.Name == "initial")
-                MainGame.Instance.GraphicsManager.LoadGraphicBatchByNameAsync(GlobalConfig.GrahpicDefinitionFile, "initial");
+            if (batch.Name == "Initial")
+                MainGame.Instance.GraphicsManager.LoadBatchesAsync(GlobalConfig.InitialGraphicBatchFile);
         }
 
         public void HandleGraphicsBatchLoaded(ILoadBatch<IGraphic2D> batch)
         {
-            if (batch.Name == "initial")
-                MainGame.Instance.GraphicsManager.LoadBatchGraphicsAsync(batch.Id);
+            if (batch.Name == "Initial")
+                MainGame.Instance.GraphicsManager.LoadBatchGraphicsByIdAsync(batch.Id);
         }
 
         public void HandleBatchGraphicsLoaded(ILoadBatch<IGraphic2D> batch)

@@ -38,22 +38,21 @@ namespace NinjaGame.Graphics2D.Extensions
             if (text == null)
             {
                 text = Graphics2DConfig.DefaultText;
-                if (text?.Loaded == false) return;
+                if (text?.Loaded == false)
+                    return;
             }
-            
+
             var drawPosition = rootPosition + text.PositionOffset;
 
             if (text?.Loaded == false)
             {
-                var color = text.Enabled ? text.Color : text.DisabledColor;
+                var color = text.Color;
                 var spriteFont = Graphics2DConfig.DefaultText?.SpriteFontAsset.SpriteFont;
-                if (spriteFont != null) sb.DrawString(spriteFont, text.DrawText, drawPosition, color);
+                if (spriteFont != null)
+                    sb.DrawString(spriteFont, text.DrawText, drawPosition, color);
             }
 
-            if (enabled)
-                sb.DrawString(text.SpriteFontAsset.SpriteFont, text.DrawText, drawPosition, text.Color);
-            else
-                sb.DrawString(text.SpriteFontAsset.SpriteFont, text.DrawText, drawPosition, text.DisabledColor);
+            sb.DrawString(text.SpriteFontAsset.SpriteFont, text.DrawText, drawPosition, text.Color);
         }
     }
 }
