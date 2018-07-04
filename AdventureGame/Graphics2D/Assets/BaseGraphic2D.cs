@@ -6,6 +6,7 @@ namespace NinjaGame.Graphics2D.Assets
     public abstract class BaseGraphic2D : IGraphic2D
     {
         public virtual string Id { get { return _id; } }
+        public virtual string Name { get { return _name; } }
         public abstract bool Loaded { get; }
 
         public virtual bool Visible
@@ -37,15 +38,16 @@ namespace NinjaGame.Graphics2D.Assets
         public AssetType Type => AssetType.None;
 
         protected string _id;
+        protected string _name;
         protected bool _visible;
         protected bool _enabled;
         protected Vector2 _positionOffset;
         protected Vector2 _dimensions;
-
-
-        public BaseGraphic2D(string id)
+        
+        public BaseGraphic2D(string id, string name)
         {
             _id = id;
+            _name = name;
         }
 
         public virtual void Unload() { /* No op */ }

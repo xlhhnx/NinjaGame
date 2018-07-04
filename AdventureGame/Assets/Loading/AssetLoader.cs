@@ -54,20 +54,38 @@ namespace NinjaGame.Assets.Loading
             return asset;
         }
 
+        public IAsset LoadAssetByName(string filePath, string name, ContentManager contentManager)
+        {
+            var stagedAsset = StageAssetByName(filePath, name, contentManager);
+
+            if (stagedAsset.Content == null || stagedAsset.Type == AssetType.None || stagedAsset.Id == string.Empty || stagedAsset.FilePath == string.Empty)
+                return null;
+
+            var asset = LoadAsset(stagedAsset);
+            return asset;
+        }
+
         public IAssetBatch LoadBatch(string filePath, string id, IServiceProvider serviceProvider)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains($"id>{id}"))
+                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             var work = definition.Split(';');
 
+            var name = "";
             var fileIdDict = new Dictionary<string, List<string>>();
             for (int i = 0; i < work.Length; i++)
             {
-                var pair = work[i].Split('=');
-                if (pair.Length > 1 && pair[0].Trim().Length > 0)
+                if (work[i].Contains('='))
                 {
+                    var pair = work[i].Split('=');
+                    if (pair[0].Trim().ToLower() == "name")
+                        name = pair[1].Trim();
+                }
+                else if (work[i].Contains(':'))
+                {
+                    var pair = work[i].Split(':');
                     var ids = pair[1].Trim()
                                 .Trim('{','}')
                                 .Split(',')
@@ -78,8 +96,42 @@ namespace NinjaGame.Assets.Loading
                 }
             }
 
-            var batch = new AssetBatch(id, serviceProvider);
-            batch.FileIdDict = fileIdDict;
+            var batch = new AssetBatch(id, name, serviceProvider) { FileIdDict = fileIdDict };
+            return batch;
+        }
+
+        public IAssetBatch LoadBatchByName(string filePath, string name, IServiceProvider serviceProvider)
+        {
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.ToLower().StartsWith("assetbatch") && l.Contains($"name={name}"))
+                                .FirstOrDefault();
+
+            var work = definition.Split(';');
+
+            var id = "";
+            var fileIdDict = new Dictionary<string, List<string>>();
+            for (int i = 0; i < work.Length; i++)
+            {
+                if (work[i].Contains('='))
+                {
+                    var pair = work[i].Split('=');
+                    if (pair[0].Trim().ToLower() == "id")
+                        id = pair[1].Trim();
+                }
+                else if (work[i].Contains(':'))
+                {
+                    var pair = work[i].Split(':');
+                    var ids = pair[1].Trim()
+                                .Trim('{','}')
+                                .Split(',')
+                                .Select(l => l.Trim())
+                                .ToList();
+
+                    fileIdDict.Add(pair[0].Trim(), ids);
+                }
+            }
+
+            var batch = new AssetBatch(id, name, serviceProvider) { FileIdDict = fileIdDict };
             return batch;
         }
 
@@ -115,6 +167,11 @@ namespace NinjaGame.Assets.Loading
 
             var stagedAsset = new StagedAsset(id, fileName, type, contentManager);
             return stagedAsset;
+        }
+
+        public StagedAsset StageAssetByName(string filePath, string name, ContentManager contentManager)
+        {
+            throw new NotImplementedException();
         }
 
         private AssetType ParseType(string typeString)

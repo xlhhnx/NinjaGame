@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NinjaGame.Common
+namespace NinjaGame.Common.Loading
 {
     public interface ILoadBatch<T>
     {
         string Id { get; }
+        string Name { get; }
         List<T> Values { get; set; }
         Dictionary<string, List<string>> FileIdDict { get; set; }
 

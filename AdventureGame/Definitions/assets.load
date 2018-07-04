@@ -1,3 +1,7 @@
-﻿asset=spritefont; id=000000000001; filepath=Content\default
+﻿assetbatch; id=000001; name=Initial; Definitions\assets.load : { 000000000003 }
+assetbatch; id=000002; name=Startup; Definitions\assets.load : { 000000000001 , 000000000002 }
+
+asset=spritefont; id=000000000001; filepath=Content\default
 asset=texture2d; id=000000000002; filepath=Content\white
 asset=spritefont; id=000000000003; filepath=Content\SplashFont
+asset=spritefont; id=000000000004; filepath=Content\mainMenuButtonText

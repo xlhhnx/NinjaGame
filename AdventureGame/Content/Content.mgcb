@@ -39,3 +39,10 @@
 /processorParam:TextureFormat=Color
 /build:white.png
 
+#begin mainMenuButtonText.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:mainMenuButtonText.spritefont
+

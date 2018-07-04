@@ -44,6 +44,7 @@
     <StartupObject>NinjaGame.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assets\AssetDefinition.cs" />
     <Compile Include="Assets\Batches\IAssetBatch.cs" />
     <Compile Include="Assets\Loading\IAssetLoader.cs" />
     <Compile Include="Assets\Batches\AssetBatch.cs" />
@@ -57,7 +58,6 @@
     <Compile Include="Assets\Loading\AssetLoader.cs" />
     <Compile Include="Assets\Management\AssetManager.cs" />
     <Compile Include="Assets\Management\IAssetManager.cs" />
-    <Compile Include="Assets\StagedAsset.cs" />
     <Compile Include="Common\Bounding\BoundingBox.cs" />
     <Compile Include="Common\Bounding\CompoundBound.cs" />
     <Compile Include="Common\Bounding\IBounds.cs" />
@@ -65,8 +65,10 @@
     <Compile Include="Common\Extensions\StringExtensions.cs" />
     <Compile Include="Common\Extensions\TaskExtensions.cs" />
     <Compile Include="Common\Extensions\Vector2Extensions.cs" />
-    <Compile Include="Common\ILoadBatch.cs" />
-    <Compile Include="Common\LoadBatch.cs" />
+    <Compile Include="Common\Loading\Definition.cs" />
+    <Compile Include="Common\Loading\IDefinition.cs" />
+    <Compile Include="Common\Loading\ILoadBatch.cs" />
+    <Compile Include="Common\Loading\LoadBatch.cs" />
     <Compile Include="Common\ScreenMode.cs" />
     <Compile Include="Common\Taskbar.cs" />
     <Compile Include="Common\Utility.cs" />
@@ -85,7 +87,6 @@
     <Compile Include="Graphics2D\Loading\IGraphic2DLoader.cs" />
     <Compile Include="Graphics2D\Managers\Graphics2DManager.cs" />
     <Compile Include="Graphics2D\Managers\IGraphics2DManager.cs" />
-    <Compile Include="Graphics2D\StagedGraphic.cs" />
     <Compile Include="Input\ButtonStates.cs" />
     <Compile Include="Input\Controllers\GamepadController.cs" />
     <Compile Include="Input\Controllers\KeyboardController.cs" />
@@ -119,7 +120,6 @@
     <Compile Include="UI\Loading\IControlLoader.cs" />
     <Compile Include="UI\Managers\IUserInterfaceManager.cs" />
     <Compile Include="UI\Managers\UserInterfaceManager.cs" />
-    <Compile Include="UI\StagedControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -129,6 +129,7 @@
       <HintPath>packages\NAudio.1.8.4\lib\net35\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -144,9 +145,7 @@
     <None Include="Definitions\assets.load">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Definitions\batches.load">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Definitions\controls.load" />
     <None Include="Definitions\graphics.load">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -40,6 +40,7 @@ namespace NinjaGame.UI.Controls
             get { return _buttonText.FullText; }
             set { _buttonText.FullText = value; }
         }
+        public string Name { get; protected set; }
         public string DisplayText { get { return _buttonText.DrawText; } }
         public Action Action { get; set; }
         public Vector2 Position
@@ -80,6 +81,7 @@ namespace NinjaGame.UI.Controls
                 return _boundingBox.Value;
             }
         }
+
         protected bool _centered;
         protected Image _blurredImage;
         protected Image _focusedImage;
@@ -93,7 +95,7 @@ namespace NinjaGame.UI.Controls
         private KeyboardController _keyboardController;
         private MouseController _mouseController;
 
-        public Button(Vector2 position, Vector2 dimensions, Action action, Image blurredImage, Image focusedImage, Image clickedImage, Text text, bool centered = false)
+        public Button(Vector2 position, Vector2 dimensions, Action action, Image blurredImage, Image focusedImage, Image clickedImage, Text text, string name = "button", bool centered = false)
         {
             if (blurredImage is null || focusedImage is null || clickedImage is null || text is null)
                 throw new NullParameterException();
@@ -105,6 +107,7 @@ namespace NinjaGame.UI.Controls
             _clickedImage = clickedImage;
             _buttonText = text;
             _currentImage = _blurredImage;
+            Name = name;
             Dimensions = dimensions;
             Centered = centered;
 

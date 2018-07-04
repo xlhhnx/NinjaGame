@@ -1,0 +1,3 @@
+﻿controlbatch; id=000001; name=Startup; Definitions\controls.load : { 000000000001 }
+
+control=button; position=(0,0); 

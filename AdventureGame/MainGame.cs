@@ -154,7 +154,7 @@ namespace NinjaGame
         public void UnloadAndExit()
         {
             UnloadContent();
-            Taskbar.Show();
+            //Taskbar.Show();
             Exit();
         }    
         
@@ -206,14 +206,14 @@ namespace NinjaGame
             {
                 case (ScreenMode.FullScreen):
                     {
-                        Taskbar.Hide();
+                        //Taskbar.Hide();
                         Window.IsBorderless = false;
                         Graphics.IsFullScreen = true;
                     }
                     break;
                 case (ScreenMode.Borderless):
                     {
-                        Taskbar.Hide();
+                        //Taskbar.Hide();
                         Graphics.IsFullScreen = false;
                         Window.IsBorderless = true;
                     }
@@ -222,7 +222,7 @@ namespace NinjaGame
                     {
                         Graphics.IsFullScreen = false;
                         Window.IsBorderless = false;
-                        Taskbar.Show();
+                        //Taskbar.Show();
                     }
                     break;
             }

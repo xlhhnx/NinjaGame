@@ -24,8 +24,14 @@ namespace NinjaGame.Scenes
             _timeout = new TimeSpan(0, 0, 30);
             _elapsedTime = new TimeSpan();
 
+            //MainGame.Instance.SetScreenMode(ScreenMode.FullScreen);
             MainGame.Instance.SetScreenMode(ScreenMode.Borderless);
             MainGame.Instance.SetResolution();
+            
+            var form = (Form)Control.FromHandle(MainGame.Instance.Window.Handle);
+            form.Location = new System.Drawing.Point(-MainGame.Instance.GraphicsDevice.Viewport.Width, 0);
+            //form.Location = new System.Drawing.Point(0, 0);
+
             Console.WriteLine($"gamePos={MainGame.Instance.GraphicsDevice.Viewport.X} {MainGame.Instance.GraphicsDevice.Viewport.Y}");
 
             MainGame.Instance.AssetManager.AssetBatchLoadedEvent += HandleAssetBatchLoaded;
@@ -33,7 +39,7 @@ namespace NinjaGame.Scenes
             MainGame.Instance.GraphicsManager.GraphicBatchLoadedEvent += HandleGraphicsBatchLoaded;
             MainGame.Instance.GraphicsManager.BatchGraphicsLoadedEvent += HandleBatchGraphicsLoaded;
 
-            MainGame.Instance.AssetManager.LoadAssetBatchAsync(GlobalConfig.InitialAssetDefinitionFile, GlobalConfig.InitialAssetBatchId);
+            MainGame.Instance.AssetManager.LoadAssetBatchByNameAsync(GlobalConfig.AssetDefinitionFile, "initial");
         }
 
         public void Draw()
@@ -53,19 +59,19 @@ namespace NinjaGame.Scenes
 
         public void HandleAssetBatchLoaded(IAssetBatch batch)
         {
-            if (batch.Id == GlobalConfig.InitialAssetBatchId)
+            if (batch.Name == "initial")
                 MainGame.Instance.AssetManager.LoadBatchAssetsAsync(batch.Id);
         }
 
         public void HandleBatchAssetsLoaded(IAssetBatch batch)
         {
-            if (batch.Id == GlobalConfig.InitialAssetBatchId)
-                MainGame.Instance.GraphicsManager.LoadGraphicBatchAsync(GlobalConfig.InitialGraphicDefinitionFile, GlobalConfig.InitialGraphicBatchId);
+            if (batch.Name == "initial")
+                MainGame.Instance.GraphicsManager.LoadGraphicBatchByNameAsync(GlobalConfig.GrahpicDefinitionFile, "initial");
         }
 
         public void HandleGraphicsBatchLoaded(ILoadBatch<IGraphic2D> batch)
         {
-            if (batch.Id == GlobalConfig.InitialGraphicBatchId)
+            if (batch.Name == "initial")
                 MainGame.Instance.GraphicsManager.LoadBatchGraphicsAsync(batch.Id);
         }
 

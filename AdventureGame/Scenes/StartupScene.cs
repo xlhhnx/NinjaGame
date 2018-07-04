@@ -7,6 +7,7 @@ using NinjaGame.Menus;
 using NinjaGame.Assets.Batches;
 using System;
 using NinjaGame.Common;
+using NinjaGame.UI.Controls;
 
 namespace NinjaGame.Scenes
 {
@@ -84,6 +85,19 @@ namespace NinjaGame.Scenes
         }
 
         public void HandleBatchGraphicsLoaded(ILoadBatch<IGraphic2D> batch)
+        {
+            _fullyLoaded = true;
+            if (batch.Id == GlobalConfig.StartupGraphicBatchId)
+                MainGame.Instance.UIManager.LoadControlBatchAsync(GlobalConfig.StartupControlDefinitionFile, GlobalConfig.StartupControlBatchId);
+        }
+
+        public void HandleControlBatchLoaded(ILoadBatch<IControl> batch)
+        {
+            if (batch.Id == GlobalConfig.StartupControlBatchId)
+                MainGame.Instance.UIManager.LoadBatchControlsAsync(batch.Id);
+        }
+
+        public void HandleBatchControlsLoaded(ILoadBatch<IControl> batch)
         {
             _fullyLoaded = true;
         }

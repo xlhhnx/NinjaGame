@@ -165,7 +165,7 @@ namespace NinjaGame.UI.Loading
             var clickedImage = _graphicsManager.GetImage(clickedImageId);
             var text = _graphicsManager.GetText(textId);
 
-            return new Button(position, dimensions, null, blurredImage, focusedImage, clickedImage, text, centered);
+            return new Button(position, dimensions, null, blurredImage, focusedImage, clickedImage, text, centered:centered);
         }
     }
 }

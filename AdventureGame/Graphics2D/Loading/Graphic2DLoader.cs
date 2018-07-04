@@ -7,19 +7,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NinjaGame.Common;
+using NinjaGame.Common.Loading;
 
 namespace NinjaGame.Graphics2D.Loading
 {
     public class Graphic2DLoader : IGraphic2DLoader
     {
         protected IAssetManager _assetManager;
+        protected List<Definition<GraphicType>> _definitions;
 
         public Graphic2DLoader(IAssetManager assetManager)
         {
             _assetManager = assetManager;
+            _definitions = new List<Definition<GraphicType>>();
         }
 
-        public IGraphic2D LoadGraphic(StagedGraphic stagedGraphic)
+        public IGraphic2D LoadGraphic(IDefinition<GraphicType> stagedGraphic)
         {
             IGraphic2D graphic = null;
             switch (stagedGraphic.Type)
@@ -43,70 +46,171 @@ namespace NinjaGame.Graphics2D.Loading
         public ILoadBatch<IGraphic2D> LoadGraphicBatch(string filePath, string id)
         {
             var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
-                                .Where(l => l.ToLower().StartsWith("graphicbatch") && l.Contains($"id>{id}"))
+                                .Where(l => l.ToLower().StartsWith("graphicbatch") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
             var work = definition.Split(';');
 
+            var name = "";
             var fileIdDict = new Dictionary<string, List<string>>();
             for (int i = 0; i < work.Length; i++)
             {
-                var pair = work[i].Split('=');
-                if (pair.Length > 1 && pair[0].Trim().Length > 0)
+                if (work[i].Contains('='))
                 {
+                    var pair = work[i].Split('=');
+                    if (pair[0].Trim().ToLower() == "name")
+                        name = pair[1].Trim().ToLower();
+                }
+                else if (work[i].Contains(':'))
+                {
+                    var pair = work[i].Split(':');
                     var ids = pair[1].Trim()
-                                .Trim('{','}')
-                                .Split(',')
-                                .Select(l => l.Trim())
-                                .ToList();
+                                   .Trim('{', '}')
+                                   .Split(',')
+                                   .Select(l => l.Trim())
+                                   .ToList();
 
                     fileIdDict.Add(pair[0].Trim(), ids);
                 }
+                
             }
 
-            var batch = new LoadBatch<IGraphic2D>(id);
+            var batch = new LoadBatch<IGraphic2D>(id, name);
             batch.FileIdDict = fileIdDict;
             return batch;
         }
 
-        public StagedGraphic StageGraphic(string filePath, string id)
+        public IDefinition<GraphicType> LoadDefinition(string filePath, string id)
         {
-            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+            var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
                                 .Where(l => l.ToLower().StartsWith("graphic") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
-            if (definition.Length == 0)
-                return new StagedGraphic();
+            if (line.Length == 0)
+                return null;
 
-            var work = definition.Split(';');
-            
+            var work = line.Split(';');
+
+            var name = "";
             GraphicType type = GraphicType.None;
             for (int i = 0; i < work.Length; i++)
             {
                 var pair = work[i].Split('=');
-                if (pair[0].Trim().ToLower() == "graphic")
+                switch (pair[0].Trim().ToLower())
                 {
-                    type = ParseType(pair[1].Trim().ToLower());
-                    break;
+                    case ("graphic"):
+                        type = ParseType(pair[1].Trim().ToLower());
+                        break;
+                    case ("name"):
+                        name = pair[1].Trim().ToLower();
+                        break;
                 }
             }
 
             if (type == GraphicType.None)
-                return new StagedGraphic();
+                return null;
 
-            var stagedGraphic = new StagedGraphic(id, filePath, type);
-            return stagedGraphic;
+            var definition = new Definition<GraphicType>(id, name, filePath, type);
+            if (!(definition is null) && !_definitions.Contains(definition))
+                _definitions.Add(definition);
+
+            return definition;
         }
 
         public IGraphic2D LoadGraphic(string filePath, string id)
         {
-            var stagedGraphic = StageGraphic(filePath, id);
+            var definition = LoadDefinition(filePath, id);
 
-            if (stagedGraphic.FilePath == string.Empty || stagedGraphic.Id == string.Empty || stagedGraphic.Type == GraphicType.None)
+            if (definition is null)
                 return null;
 
-            var graphic = LoadGraphic(stagedGraphic);
+            var graphic = LoadGraphic(definition);
             return graphic;
+        }
+
+        public IGraphic2D LoadGraphicByName(string filePath, string name)
+        {
+            var definition = LoadDefinitionByName(filePath, name);
+
+            if (definition is null)
+                return null;
+
+            var graphic = LoadGraphic(definition);
+            return graphic;
+        }
+
+        public ILoadBatch<IGraphic2D> LoadGraphicBatchByName(string filePath, string name)
+        {
+            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.ToLower().StartsWith("graphicbatch") && l.Contains($"name={name}"))
+                                .FirstOrDefault();
+
+            var work = definition.Split(';');
+
+            var id = "";
+            var fileIdDict = new Dictionary<string, List<string>>();
+            for (int i = 0; i < work.Length; i++)
+            {
+                if (work[i].Contains('='))
+                {
+                    var pair = work[i].Split('=');
+                    if (pair[0].Trim().ToLower() == "id")
+                        name = pair[1].Trim();
+                }
+                else if (work[i].Contains(':'))
+                {
+                    var pair = work[i].Split(':');
+                    var ids = pair[1].Trim()
+                                   .Trim('{', '}')
+                                   .Split(',')
+                                   .Select(l => l.Trim())
+                                   .ToList();
+
+                    fileIdDict.Add(pair[0].Trim(), ids);
+                }
+                
+            }
+
+            var batch = new LoadBatch<IGraphic2D>(id, name);
+            batch.FileIdDict = fileIdDict;
+            return batch;
+        }
+
+        public IDefinition<GraphicType> LoadDefinitionByName(string filePath, string name)
+        {
+            var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.ToLower().StartsWith("graphic") && l.Contains($"name={name}"))
+                                .FirstOrDefault();
+
+            if (line.Length == 0)
+                return null;
+
+            var work = line.Split(';');
+
+            var id = "";
+            GraphicType type = GraphicType.None;
+            for (int i = 0; i < work.Length; i++)
+            {
+                var pair = work[i].Split('=');
+                switch (pair[0].Trim().ToLower())
+                {
+                    case ("graphic"):
+                        type = ParseType(pair[1].Trim().ToLower());
+                        break;
+                    case ("id"):
+                        id = pair[1].Trim();
+                        break;
+                }
+            }
+
+            if (type == GraphicType.None)
+                return null;
+
+            var definition = new Definition<GraphicType>(id, name, filePath, type);            
+            if (!(definition is null) && !_definitions.Contains(definition))
+                _definitions.Add(definition);
+
+            return definition;
         }
 
         private Text ParseText(string filePath, string id)

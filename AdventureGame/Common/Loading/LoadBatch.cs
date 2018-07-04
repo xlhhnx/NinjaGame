@@ -4,17 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NinjaGame.Common
+namespace NinjaGame.Common.Loading
 {
     public class LoadBatch<T> : ILoadBatch<T>
     {
-        public virtual string Id { get; private set; }
+        public virtual string Id { get; protected set; }
+        public virtual string Name { get; protected set; }
         public virtual List<T> Values { get; set; }
         public virtual Dictionary<string, List<string>> FileIdDict { get; set; }
 
-        public LoadBatch(string id)
+        public LoadBatch(string id, string name)
         {
             Id = id;
+            Name = name;
             Values = new List<T>();
             FileIdDict = new Dictionary<string, List<string>>();
         }
