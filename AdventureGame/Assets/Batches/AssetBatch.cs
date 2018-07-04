@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Content;
-using NinjaGame.Common;
+using NinjaGame.Common.Loading;
 using System;
-using System.Collections.Generic;
 
 namespace NinjaGame.Assets.Batches
 {

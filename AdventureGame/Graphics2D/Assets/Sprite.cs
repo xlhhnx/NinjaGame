@@ -42,8 +42,8 @@ namespace NinjaGame.Graphics2D.Assets
         protected TimeSpan _elapsedTime;
 
 
-        public Sprite(string id, Texture2DAsset texture2DAsset, Vector2 sourcePosition, Vector2 sourceDimensions, Color color, Vector2 positionOffset, Vector2 dimensions, int rows, int columns, int frameTime = -1, bool looping = true, bool enabled = true, bool visible = true)
-            : base(id, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible)
+        public Sprite(string id, string name, Texture2DAsset texture2DAsset, Vector2 sourcePosition, Vector2 sourceDimensions, Color color, Vector2 positionOffset, Vector2 dimensions, int rows, int columns, int frameTime = -1, bool looping = true, bool enabled = true, bool visible = true)
+            : base(id, name, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible)
         {
             _sourcePosition = sourcePosition;
             _sourceDimensions = sourceDimensions;
@@ -94,7 +94,7 @@ namespace NinjaGame.Graphics2D.Assets
 
         public override IGraphic2D Copy()
         {
-            return new Sprite(Id, _texture2DAsset, _sourceRectangle.GetPosition(), _sourceRectangle.GetDimensions(), _color, _positionOffset, _dimensions, _rows, _columns, _frameTime, _looping, _enabled, _visible);
+            return new Sprite(Id, Name, _texture2DAsset, _sourceRectangle.GetPosition(), _sourceRectangle.GetDimensions(), _color, _positionOffset, _dimensions, _rows, _columns, _frameTime, _looping, _enabled, _visible);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace NinjaGame.UI.Loading
         IControl LoadControl(IDefinition<ControlType> stagedControl);
         ILoadBatch<IControl> LoadControlBatch(string filePath, string id);
         ILoadBatch<IControl> LoadControlBatchByName(string filePath, string name);
-        IDefinition<ControlType> StageControl(string filePath, string id);
-        IDefinition<ControlType> StageControlByName(string filePath, string name);
+        IDefinition<ControlType> LoadDefinition(string filePath, string id);
+        IDefinition<ControlType> LoadDefinitionByName(string filePath, string name);
     }
 }

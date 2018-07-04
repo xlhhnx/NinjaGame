@@ -1,5 +1,4 @@
-﻿using NinjaGame.AssetManagement;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 
 namespace NinjaGame.Assets
 {
@@ -17,7 +16,8 @@ namespace NinjaGame.Assets
         protected WaveStream _stream;
 
 
-        public AudioAsset(string id, WaveStream stream) : base(id)
+        public AudioAsset(string id, string name, WaveStream stream) 
+            : base(id, name)
         {
             _stream = stream;
             _loaded = true;

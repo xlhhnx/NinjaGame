@@ -1,5 +1,4 @@
-﻿using NinjaGame.AssetManagement;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 
 namespace NinjaGame.Assets
 {
@@ -13,8 +12,8 @@ namespace NinjaGame.Assets
         protected SpriteFont _spriteFont;
 
 
-        public SpriteFontAsset(string assetId, SpriteFont spriteFont)
-            : base(assetId)
+        public SpriteFontAsset(string assetId, string name, SpriteFont spriteFont)
+            : base(assetId, name)
         {
             _spriteFont = spriteFont;
             _loaded = _spriteFont != null;

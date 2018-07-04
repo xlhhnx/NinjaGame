@@ -4,7 +4,7 @@ namespace NinjaGame.Graphics2D.Assets
 {
     public class Effect : BaseGraphic2D
     {
-        public Effect(string id) : base(id)
+        public Effect(string id, string name) : base(id, name)
         {
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NinjaGame.AssetManagement;
 using NinjaGame.Assets.Batches;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,42 +11,45 @@ namespace NinjaGame.Assets.Loading
 {
     public class AssetLoader : IAssetLoader
     {
+        protected Dictionary<string, string> _nameIdDict;
+        protected Dictionary<string, AssetDefinition> _definitions;
+
+        public AssetLoader()
+        {
+            _nameIdDict = new Dictionary<string, string>();
+            _definitions = new Dictionary<string, AssetDefinition>();
+        }
+
         public IAsset LoadAsset(string filePath, string id, ContentManager contentManager)
         {
-            var stagedAsset = StageAsset(filePath, id, contentManager);
+            var definition = LoadDefinition(filePath, id, contentManager);
 
-            if (stagedAsset.Content == null || stagedAsset.Type == AssetType.None || stagedAsset.Id == string.Empty || stagedAsset.FilePath == string.Empty)
+            if (definition is null)
                 return null;
 
-            var asset = LoadAsset(stagedAsset);
+            var asset = LoadAsset(definition);
             return asset;
         }
 
-        public IAsset LoadAsset(StagedAsset stagedAsset)
+        public IAsset LoadAsset(AssetDefinition definition)
         {
             IAsset asset = null;
 
-            switch (stagedAsset.Type)
+            switch (definition.Type)
             {
                 case (AssetType.AudioAsset):
-                    asset = new AudioAsset(stagedAsset.Id, new AudioFileReader(stagedAsset.FilePath));
+                    asset = new AudioAsset(definition.Id, definition.Name, new AudioFileReader(definition.FilePath));
                     break;
                 case (AssetType.SpriteFontAsset):
                     {
-                        SpriteFont sf;
-                        lock (stagedAsset.Content)
-                            sf = stagedAsset.Content.Load<SpriteFont>(stagedAsset.FilePath);
-
-                        asset = new SpriteFontAsset(stagedAsset.Id, sf);
+                        var sf = definition.Content.Load<SpriteFont>(definition.FilePath);
+                        asset = new SpriteFontAsset(definition.Id, definition.Name, sf);
                     }
                     break;
                 case (AssetType.Texture2DAsset):
                     {
-                        Texture2D td;
-                        lock (stagedAsset.Content)
-                            td = stagedAsset.Content.Load<Texture2D>(stagedAsset.FilePath);
-
-                        asset = new Texture2DAsset(stagedAsset.Id, td);
+                        var td = definition.Content.Load<Texture2D>(definition.FilePath);
+                        asset = new Texture2DAsset(definition.Id, definition.Name, td);
                     }
                     break;
             }
@@ -56,7 +58,7 @@ namespace NinjaGame.Assets.Loading
 
         public IAsset LoadAssetByName(string filePath, string name, ContentManager contentManager)
         {
-            var stagedAsset = StageAssetByName(filePath, name, contentManager);
+            var stagedAsset = LoadDefinitionByName(filePath, name, contentManager);
 
             if (stagedAsset.Content == null || stagedAsset.Type == AssetType.None || stagedAsset.Id == string.Empty || stagedAsset.FilePath == string.Empty)
                 return null;
@@ -135,18 +137,23 @@ namespace NinjaGame.Assets.Loading
             return batch;
         }
 
-        public StagedAsset StageAsset(string filePath, string id, ContentManager contentManager)
+        public AssetDefinition LoadDefinition(string filePath, string id, ContentManager contentManager)
         {
-            var definition = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+            _definitions.TryGetValue(id, out var def);
+            if (!(def is null))
+                return def;
+
+            var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
                                 .Where(l => l.ToLower().StartsWith("asset") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
 
-            if (definition.Length == 0)
-                return new StagedAsset();
+            if (line.Length == 0)
+                return null;
 
-            var work = definition.Split(';');
+            var work = line.Split(';');
 
-            string fileName = "";
+            var name = "";
+            var fileName = "";
             AssetType type = AssetType.None;
             for (int i = 0; i < work.Length; i++)
             {
@@ -159,19 +166,77 @@ namespace NinjaGame.Assets.Loading
                     case ("asset"):
                         type = ParseType(pair[1].Trim().ToLower());
                         break;
+                    case ("name"):
+                        id = pair[1].Trim().ToLower();
+                        break;
                 }
             }
 
             if (fileName == string.Empty || type == AssetType.None)
-                return new StagedAsset();
+                return null;
 
-            var stagedAsset = new StagedAsset(id, fileName, type, contentManager);
-            return stagedAsset;
+            var definition = new AssetDefinition(id, name, fileName, type, contentManager);
+
+            if (!(definition is null) && !_definitions.ContainsKey(id))
+                _definitions.Add(id, definition);
+            
+            if (!_nameIdDict.ContainsKey(definition.Name))
+                _nameIdDict.Add(definition.Name, definition.Id);
+
+            return definition;
         }
 
-        public StagedAsset StageAssetByName(string filePath, string name, ContentManager contentManager)
+        public AssetDefinition LoadDefinitionByName(string filePath, string name, ContentManager contentManager)
         {
-            throw new NotImplementedException();
+            _nameIdDict.TryGetValue(name, out var tmpId);
+            if (!(tmpId is null))
+            {
+                _definitions.TryGetValue(tmpId, out var def);
+                if (!(def is null))
+                    return def;
+            }
+
+            var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
+                                .Where(l => l.ToLower().StartsWith("asset") && l.Contains($"name={name}"))
+                                .FirstOrDefault();
+
+            if (line.Length == 0)
+                return null;
+
+            var work = line.Split(';');
+
+            var id = "";
+            var fileName = "";
+            AssetType type = AssetType.None;
+            for (int i = 0; i < work.Length; i++)
+            {
+                var pair = work[i].Split('=');
+                switch (pair[0].Trim().ToLower())
+                {
+                    case ("filepath"):
+                        fileName = pair[1].Trim();
+                        break;
+                    case ("asset"):
+                        type = ParseType(pair[1].Trim().ToLower());
+                        break;
+                    case ("id"):
+                        id = pair[1].Trim();
+                        break;
+                }
+            }
+
+            if (fileName == string.Empty || type == AssetType.None)
+                return null;
+
+            var definition = new AssetDefinition(id, name, fileName, type, contentManager);
+            
+            if (!(definition is null) && !_definitions.ContainsKey(id))
+                _definitions.Add(id, definition);
+            
+            if (!_nameIdDict.ContainsKey(definition.Name))
+                _nameIdDict.Add(definition.Name, definition.Id);
+
+            return definition;
         }
 
         private AssetType ParseType(string typeString)

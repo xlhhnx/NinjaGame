@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NinjaGame.Common.Loading
 {
@@ -19,6 +15,18 @@ namespace NinjaGame.Common.Loading
             Name = name;
             FilePath = filePath;
             Type = type;
+        }
+
+        public bool Equals(IDefinition<T> other)
+        {
+            var equal = FilePath == other.FilePath;
+
+            if (equal && Id != null)
+                equal = Id == other.Id;
+            else if (equal)
+                equal = Name == other.Name;
+
+            return equal;
         }
     }
 }

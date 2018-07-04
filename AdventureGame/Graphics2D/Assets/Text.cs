@@ -52,8 +52,8 @@ namespace NinjaGame.Graphics2D.Assets
         protected SpriteFontAsset _spriteFontAsset;
 
 
-        public Text(string id, SpriteFontAsset spriteFontAsset, Color color, Color disabledColor, Vector2 positionOffset, Vector2 dimensions, string fullText, bool visible = true, bool enabled = true)
-            : base(id)
+        public Text(string id, string name, SpriteFontAsset spriteFontAsset, Color color, Color disabledColor, Vector2 positionOffset, Vector2 dimensions, string fullText, bool visible = true, bool enabled = true)
+            : base(id, name)
         {
             _spriteFontAsset = spriteFontAsset;
             _color = color;
@@ -68,7 +68,7 @@ namespace NinjaGame.Graphics2D.Assets
 
         public override IGraphic2D Copy()
         {
-            return new Text(Id, _spriteFontAsset, _color, _disabledColor, _positionOffset, _dimensions, _fullText);
+            return new Text(Id, Name, _spriteFontAsset, _color, _disabledColor, _positionOffset, _dimensions, _fullText);
         }
 
         public string TrimText(string text, Vector2 dimensions)

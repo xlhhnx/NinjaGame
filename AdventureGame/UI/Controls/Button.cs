@@ -2,12 +2,12 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using NinjaGame.AssetManagement;
 using NinjaGame.Exceptions;
 using NinjaGame.Graphics2D.Assets;
 using NinjaGame.Graphics2D.Extensions;
 using NinjaGame.Input;
 using NinjaGame.Input.Controllers;
+using NinjaGame.Assets;
 
 namespace NinjaGame.UI.Controls
 {

@@ -14,12 +14,14 @@ namespace NinjaGame.Graphics2D.Loading
     public class Graphic2DLoader : IGraphic2DLoader
     {
         protected IAssetManager _assetManager;
-        protected List<Definition<GraphicType>> _definitions;
+        protected Dictionary<string, string> _nameIdDict;
+        protected Dictionary<string, Definition<GraphicType>> _definitions;
 
         public Graphic2DLoader(IAssetManager assetManager)
         {
             _assetManager = assetManager;
-            _definitions = new List<Definition<GraphicType>>();
+            _nameIdDict = new Dictionary<string, string>();
+            _definitions = new Dictionary<string, Definition<GraphicType>>();
         }
 
         public IGraphic2D LoadGraphic(IDefinition<GraphicType> stagedGraphic)
@@ -82,6 +84,10 @@ namespace NinjaGame.Graphics2D.Loading
 
         public IDefinition<GraphicType> LoadDefinition(string filePath, string id)
         {
+            _definitions.TryGetValue(id, out var def);
+            if (!(def is null))
+                return def;
+
             var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
                                 .Where(l => l.ToLower().StartsWith("graphic") && l.Contains($"id={id}"))
                                 .FirstOrDefault();
@@ -111,8 +117,12 @@ namespace NinjaGame.Graphics2D.Loading
                 return null;
 
             var definition = new Definition<GraphicType>(id, name, filePath, type);
-            if (!(definition is null) && !_definitions.Contains(definition))
-                _definitions.Add(definition);
+
+            if (!(definition is null) && !_definitions.ContainsKey(id))
+                _definitions.Add(id, definition);
+
+            if (!_nameIdDict.ContainsKey(definition.Name))
+                _nameIdDict.Add(definition.Name, definition.Id);
 
             return definition;
         }
@@ -155,7 +165,7 @@ namespace NinjaGame.Graphics2D.Loading
                 {
                     var pair = work[i].Split('=');
                     if (pair[0].Trim().ToLower() == "id")
-                        name = pair[1].Trim();
+                        id = pair[1].Trim();
                 }
                 else if (work[i].Contains(':'))
                 {
@@ -167,8 +177,7 @@ namespace NinjaGame.Graphics2D.Loading
                                    .ToList();
 
                     fileIdDict.Add(pair[0].Trim(), ids);
-                }
-                
+                }                
             }
 
             var batch = new LoadBatch<IGraphic2D>(id, name);
@@ -178,6 +187,14 @@ namespace NinjaGame.Graphics2D.Loading
 
         public IDefinition<GraphicType> LoadDefinitionByName(string filePath, string name)
         {
+            _nameIdDict.TryGetValue(name, out var tmpId);
+            if (!(tmpId is null))
+            {
+                _definitions.TryGetValue(tmpId, out var def);
+                if (!(def is null))
+                    return def;
+            }
+
             var line = File.ReadAllLines(filePath).Where(l => l.Length > 0)
                                 .Where(l => l.ToLower().StartsWith("graphic") && l.Contains($"name={name}"))
                                 .FirstOrDefault();
@@ -206,9 +223,13 @@ namespace NinjaGame.Graphics2D.Loading
             if (type == GraphicType.None)
                 return null;
 
-            var definition = new Definition<GraphicType>(id, name, filePath, type);            
-            if (!(definition is null) && !_definitions.Contains(definition))
-                _definitions.Add(definition);
+            var definition = new Definition<GraphicType>(id, name, filePath, type);          
+            
+            if (!(definition is null) && !_definitions.ContainsKey(id))
+                _definitions.Add(id, definition);
+            
+            if (!_nameIdDict.ContainsKey(definition.Name))
+                _nameIdDict.Add(definition.Name, definition.Id);
 
             return definition;
         }
@@ -237,39 +258,25 @@ namespace NinjaGame.Graphics2D.Loading
                 switch (pair[0].Trim().ToLower())
                 {
                     case ("name"):
-                        {
-                            name = pair[1].ToLower();
-                        }
+                        name = pair[1].ToLower();
                         break;
                     case ("spritefontasset"):
-                        {
-                            spriteFontAssetId = pair[1].Trim().ToLower();
-                        }
+                        spriteFontAssetId = pair[1].Trim().ToLower();
                         break;
                     case ("color"):
-                        {
-                            color = pair[1].Trim().ToLower().ToColor();
-                        }
+                        color = pair[1].Trim().ToLower().ToColor();
                         break;
                     case ("disabledcolor"):
-                        {
-                            disabledColor = pair[1].Trim().ToLower().ToColor();
-                        }
+                        disabledColor = pair[1].Trim().ToLower().ToColor();
                         break;
                     case ("positionoffset"):
-                        {
-                            positionOffset = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        positionOffset = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("dimensions"):
-                        {
-                            dimensions = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        dimensions = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("fulltext"):
-                        {
-                            fullText = pair[1];
-                        }
+                        fullText = pair[1];
                         break;
                 }
             }
@@ -278,7 +285,7 @@ namespace NinjaGame.Graphics2D.Loading
             if (spriteFontAsset == null)
                 spriteFontAsset = AssetConfig.DefaultSpriteFontAsset;
 
-            return new Text(id, spriteFontAsset, color, disabledColor, positionOffset, dimensions, fullText);
+            return new Text(id, name, spriteFontAsset, color, disabledColor, positionOffset, dimensions, fullText);
         }
 
         private Image ParseImage(string filePath, string id)
@@ -307,49 +314,31 @@ namespace NinjaGame.Graphics2D.Loading
                 switch (pair[0].Trim().ToLower())
                 {
                     case ("name"):
-                        {
-                            name = pair[1].ToLower();
-                        }
+                        name = pair[1].ToLower();
                         break;
                     case ("texture2dasset"):
-                        {
-                            texture2DAssetId = pair[1].Trim().ToLower();
-                        }
+                        texture2DAssetId = pair[1].Trim().ToLower();
                         break;
                     case ("color"):
-                        {
-                            color = pair[1].Trim().ToLower().ToColor();
-                        }
+                        color = pair[1].Trim().ToLower().ToColor();
                         break;
                     case ("sourceposition"):
-                        {
-                            sourcePosition = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        sourcePosition = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("sourcedimensions"):
-                        {
-                            sourceDimensions = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        sourceDimensions = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("positionoffset"):
-                        {
-                            positionOffset = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        positionOffset = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("dimensions"):
-                        {
-                            dimensions = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        dimensions = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("enabled"):
-                        {
-                            enabled = pair[1].Trim().ToLower().ToBool();
-                        }
+                        enabled = pair[1].Trim().ToLower().ToBool();
                         break;
                     case ("visible"):
-                        {
-                            visible = pair[1].Trim().ToLower().ToBool();
-                        }
+                        visible = pair[1].Trim().ToLower().ToBool();
                         break;
                 }
             }
@@ -358,7 +347,7 @@ namespace NinjaGame.Graphics2D.Loading
             if (texture2DAsset is null)
                 texture2DAsset = AssetConfig.DefaultTexture2DAsset;
 
-            return new Image(id, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible);
+            return new Image(id, name, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, enabled, visible);
         }
 
         private Sprite ParseSprite(string filePath, string id)
@@ -391,69 +380,44 @@ namespace NinjaGame.Graphics2D.Loading
                 switch (pair[0].Trim().ToLower())
                 {
                     case ("name"):
-                        {
-                            name = pair[1].ToLower();
-                        }
+
+                        name = pair[1].ToLower();
                         break;
                     case ("texture2dasset"):
-                        {
-                            texture2DAssetId = pair[1].Trim().ToLower();
-                        }
+                        texture2DAssetId = pair[1].Trim().ToLower();
                         break;
                     case ("color"):
-                        {
-                            color = pair[1].Trim().ToLower().ToColor();
-                        }
+                        color = pair[1].Trim().ToLower().ToColor();
                         break;
                     case ("sourceposition"):
-                        {
-                            sourcePosition = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        sourcePosition = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("sourcedimensions"):
-                        {
-                            sourceDimensions = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        sourceDimensions = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("positionoffset"):
-                        {
-                            positionOffset = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        positionOffset = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("dimensions"):
-                        {
-                            dimensions = pair[1].Trim().ToLower().ToVector2();
-                        }
+                        dimensions = pair[1].Trim().ToLower().ToVector2();
                         break;
                     case ("rows"):
-                        {
-                            rows = pair[1].Trim().ToLower().ToInt32();
-                        }
+                        rows = pair[1].Trim().ToLower().ToInt32();
                         break;
                     case ("columns"):
-                        {
-                            columns = pair[1].Trim().ToLower().ToInt32();
-                        }
+                        columns = pair[1].Trim().ToLower().ToInt32();
                         break;
                     case ("frametime"):
-                        {
-                            frameTime = pair[1].Trim().ToLower().ToInt32();
-                        }
+                        frameTime = pair[1].Trim().ToLower().ToInt32();
                         break;
                     case ("looping"):
-                        {
-                            looping = pair[1].Trim().ToLower().ToBool();
-                        }
+                        looping = pair[1].Trim().ToLower().ToBool();
                         break;
                     case ("enabled"):
-                        {
-                            enabled = pair[1].Trim().ToLower().ToBool();
-                        }
+                        enabled = pair[1].Trim().ToLower().ToBool();
                         break;
                     case ("visible"):
-                        {
-                            visible = pair[1].Trim().ToLower().ToBool();
-                        }
+                        visible = pair[1].Trim().ToLower().ToBool();
                         break;
                 }
             }
@@ -462,7 +426,7 @@ namespace NinjaGame.Graphics2D.Loading
             if (texture2DAsset == null)
                 texture2DAsset = AssetConfig.DefaultTexture2DAsset;
 
-            return new Sprite(id, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, rows, columns, frameTime, looping, enabled, visible);
+            return new Sprite(id, name, texture2DAsset, sourcePosition, sourceDimensions, color, positionOffset, dimensions, rows, columns, frameTime, looping, enabled, visible);
         }
 
         private Effect ParseEffect(string filePath, string id)
@@ -475,7 +439,9 @@ namespace NinjaGame.Graphics2D.Loading
                                 .Where(p => p.Contains("="))
                                 .ToList();
 
-            return new Effect(id);
+            var name = "";
+
+            return new Effect(id, name);
         }
         
         private GraphicType ParseType(string typeString)

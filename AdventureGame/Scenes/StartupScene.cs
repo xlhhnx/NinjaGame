@@ -8,6 +8,7 @@ using NinjaGame.Assets.Batches;
 using System;
 using NinjaGame.Common;
 using NinjaGame.UI.Controls;
+using NinjaGame.Common.Loading;
 
 namespace NinjaGame.Scenes
 {
@@ -36,7 +37,7 @@ namespace NinjaGame.Scenes
             MainGame.Instance.GraphicsManager.GraphicBatchLoadedEvent += HandleGraphicBatchLoaded;
             MainGame.Instance.GraphicsManager.BatchGraphicsLoadedEvent += HandleBatchGraphicsLoaded;
 
-            MainGame.Instance.AssetManager.LoadAssetBatchAsync(GlobalConfig.StartupAssetDefinitionFile, GlobalConfig.StartupAssetBatchId);
+            MainGame.Instance.AssetManager.LoadAssetBatchByNameAsync(GlobalConfig.AssetDefinitionFile, "startup");
         }
 
         public void Dispose()
@@ -68,32 +69,31 @@ namespace NinjaGame.Scenes
 
         public void HandleAssetBatchLoaded(IAssetBatch batch) 
         {
-            if (batch.Id == GlobalConfig.StartupAssetBatchId)
+            if (batch.Name == "startup")
                 MainGame.Instance.AssetManager.LoadBatchAssetsAsync(batch.Id);
         }
 
         public void HandleBatchAssetsLoaded(IAssetBatch batch)
         {
-            if (batch.Id == GlobalConfig.StartupAssetBatchId)
-                MainGame.Instance.GraphicsManager.LoadGraphicBatchAsync(GlobalConfig.StartupGraphicDefinitionFile, GlobalConfig.StartupGraphicBatchId);
+            if (batch.Name == "startup")
+                MainGame.Instance.GraphicsManager.LoadGraphicBatchByNameAsync(GlobalConfig.GrahpicDefinitionFile, "startup");
         }
 
         public void HandleGraphicBatchLoaded(ILoadBatch<IGraphic2D> batch)
         {
-            if (batch.Id == GlobalConfig.StartupGraphicBatchId)
+            if (batch.Name == "startup")
                 MainGame.Instance.GraphicsManager.LoadBatchGraphicsAsync(batch.Id);
         }
 
         public void HandleBatchGraphicsLoaded(ILoadBatch<IGraphic2D> batch)
         {
-            _fullyLoaded = true;
-            if (batch.Id == GlobalConfig.StartupGraphicBatchId)
-                MainGame.Instance.UIManager.LoadControlBatchAsync(GlobalConfig.StartupControlDefinitionFile, GlobalConfig.StartupControlBatchId);
+            if (batch.Name == "startup")
+                MainGame.Instance.UIManager.LoadControlBatchByNameAsync(GlobalConfig.ControlDefinitionFile, "startup");
         }
 
         public void HandleControlBatchLoaded(ILoadBatch<IControl> batch)
         {
-            if (batch.Id == GlobalConfig.StartupControlBatchId)
+            if (batch.Name == "startup")
                 MainGame.Instance.UIManager.LoadBatchControlsAsync(batch.Id);
         }
 

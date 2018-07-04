@@ -1,5 +1,5 @@
-﻿using NinjaGame.AssetManagement;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using NinjaGame.Assets;
 
 namespace NinjaGame.Graphics2D.Assets
 {

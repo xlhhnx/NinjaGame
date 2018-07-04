@@ -1,5 +1,4 @@
-﻿using NinjaGame.AssetManagement;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 
 namespace NinjaGame.Assets
 {
@@ -13,8 +12,8 @@ namespace NinjaGame.Assets
         protected Texture2D _texture;
 
 
-        public Texture2DAsset(string assetId, Texture2D texture)
-            : base(assetId)
+        public Texture2DAsset(string assetId, string name, Texture2D texture)
+            : base(assetId, name)
         {
             _texture = texture;
             _loaded = texture != null;

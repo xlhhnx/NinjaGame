@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NinjaGame.Common.Loading
 {
-    public interface IDefinition<T>
+    public interface IDefinition<T> : IEquatable<IDefinition<T>>
     {
         string Id { get; }
         string Name { get; }

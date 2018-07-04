@@ -1,4 +1,4 @@
-﻿using NinjaGame.Common;
+﻿using NinjaGame.Common.Loading;
 using NinjaGame.UI.Controls;
 using NinjaGame.UI.Loading;
 using System;
@@ -14,11 +14,17 @@ namespace NinjaGame.UI.Managers
         IControlLoader Loader { get; set; }
 
         void LoadControl(string filePath, string id, string batchId);
+        void LoadControlByName(string filePath, string name, string batchId);
         void LoadControlBatch(string filePath, string id);
+        void LoadControlBatchByName(string filePath, string name);
         void LoadBatchControls(string id);
+        void LoadBatchControlsByName(string name);
         void LoadControlAsync(string filePath, string id, string batchId);
+        void LoadControlByNameAsync(string filePath, string name, string batchId);
         void LoadControlBatchAsync(string filePath, string id);
+        void LoadControlBatchByNameAsync(string filePath, string name);
         void LoadBatchControlsAsync(string id);
+        void LoadBatchControlsByNameAsync(string name);
         void UnloadBatch(string id);
         void UnloadAll();
         void Recycle();

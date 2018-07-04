@@ -8,10 +8,10 @@ namespace NinjaGame.Assets.Loading
     {
         IAsset LoadAsset(string filePath, string id, ContentManager contentManager);
         IAsset LoadAssetByName(string filePath, string name, ContentManager contentManager);
-        IAsset LoadAsset(AssetDefinition stagedAsset);
+        IAsset LoadAsset(AssetDefinition definition);
         IAssetBatch LoadBatch(string filePath, string id, IServiceProvider serviceProvider);
         IAssetBatch LoadBatchByName(string filePath, string name, IServiceProvider serviceProvider);
-        AssetDefinition StageAsset(string filePath, string id, ContentManager contentManager);
-        AssetDefinition StageAssetByName(string filePath, string name, ContentManager contentManager);
+        AssetDefinition LoadDefinition(string filePath, string id, ContentManager contentManager);
+        AssetDefinition LoadDefinitionByName(string filePath, string name, ContentManager contentManager);
     }
 }

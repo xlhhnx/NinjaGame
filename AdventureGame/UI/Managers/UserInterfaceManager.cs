@@ -7,6 +7,7 @@ using NinjaGame.Common.Extensions;
 using NinjaGame.Graphics2D.Managers;
 using NinjaGame.UI.Controls;
 using NinjaGame.UI.Loading;
+using NinjaGame.Common.Loading;
 
 namespace NinjaGame.UI.Managers
 {
@@ -208,6 +209,158 @@ namespace NinjaGame.UI.Managers
         {
             _controlDict.TryGetValue(id, out var button);
             return button as Button;
+        }
+
+        public void LoadControlByName(string filePath, string name, string batchId)
+        {
+            _controlBatches.TryGetValue(batchId, out var batch);
+
+            if (batch is null)
+                return;
+
+            var control = Loader.LoadControlByName(filePath, name);
+            batch.AddValue(control);
+
+            if (!_controlDict.ContainsKey(control.Id))
+            {
+                _controlDict.Add(control.Id, control);
+                ControlLoadedEvent(control);
+            }
+        }
+
+        public void LoadControlBatchByName(string filePath, string name)
+        {
+            if (filePath is null || name is null)
+                return;
+
+            var batch = Loader.LoadControlBatchByName(filePath, name);
+
+            if (batch is null)
+                return;
+
+            if (!_controlBatches.ContainsKey(batch.Id))
+            {
+                _controlBatches.Add(batch.Id, batch);
+                ControlBatchLoadedEvent(batch);
+            }
+        }
+
+        public void LoadBatchControlsByName(string name)
+        {
+            ILoadBatch<IControl> batch = null;
+            foreach (var id in _controlBatches.Keys)
+            {
+                if (_controlBatches[id].Name == name)
+                {
+                    batch = _controlBatches[id];
+                    break;
+                }
+            }
+
+            if (batch is null)
+                return;
+
+            foreach (var controlFile in batch.FileIdDict.Keys)
+            {
+                var idList = batch.FileIdDict[controlFile];
+                foreach (var i in idList)
+                {
+                    _controlDict.TryGetValue(i, out var control);
+
+                    if (control is null)
+                        control = Loader.LoadControl(controlFile, i);
+
+                    batch.AddValue(control);
+
+                    if (!_controlDict.ContainsKey(i))
+                    {
+                        _controlDict.Add(i, control);
+                        ControlLoadedEvent(control);
+                    }
+                }
+                BatchControlsLoadedEvent(batch);
+            }
+        }
+
+        public async void LoadControlByNameAsync(string filePath, string name, string batchId)
+        {
+            _controlBatches.TryGetValue(batchId, out var batch);
+
+            if (batch is null)
+                return;
+
+            var t = Task.Run(() => Loader.LoadControlByName(filePath, name));
+            var control = await t;
+            batch.AddValue(control);
+
+            if (!_controlDict.ContainsKey(control.Id))
+            {
+                _controlDict.Add(control.Id, control);
+                ControlLoadedEvent(control);
+            }
+        }
+
+        public async void LoadControlBatchByNameAsync(string filePath, string name)
+        {
+            if (filePath is null || name is null)
+                return;
+
+            var task = Task.Run(() => Loader.LoadControlBatchByName(filePath, name));
+            var batch = await task;
+
+            if (batch is null)
+                return;
+
+            if (!_controlBatches.ContainsKey(batch.Id))
+            {
+                _controlBatches.Add(batch.Id, batch);
+                ControlBatchLoadedEvent(batch);
+            }
+        }
+
+        public async void LoadBatchControlsByNameAsync(string name)
+        {
+            ILoadBatch<IControl> batch = null;
+            foreach (var id in _controlBatches.Keys)
+            {
+                if (_controlBatches[id].Name == name)
+                {
+                    batch = _controlBatches[id];
+                    break;
+                }
+            }
+
+            if (batch is null)
+                return;
+
+            var tasks = new List<Task<IControl>>();
+            foreach (var controlFile in batch.FileIdDict.Keys)
+            {
+                var idList = batch.FileIdDict[controlFile];
+                foreach (var i in idList)
+                {
+                    _controlDict.TryGetValue(i, out var control);
+
+                    if (control is null)
+                    {
+                        var t = Task.Run(() => Loader.LoadControl(controlFile, i));
+                        tasks.Add(t);
+                    }
+                }
+            }
+
+            foreach (var t in tasks.InCompletionOrder())
+            {
+                var control = await t;
+                batch.AddValue(control);
+
+                if (!_controlDict.ContainsKey(control.Id))
+                {
+                    _controlDict.Add(control.Id, control);
+                    ControlLoadedEvent(control);
+                }
+            }
+            BatchControlsLoadedEvent(batch);
         }
     }
 }
